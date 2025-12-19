@@ -1,0 +1,12 @@
+{
+  "name": "l910-framework-v1",
+  "version": "1.0.0",
+  "description": "Базовый веб-фреймворк на Node.js",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js"
+  },
+  "keywords": ["framework", "nodejs"],
+  "author": "",
+  "license": "MIT"
+}

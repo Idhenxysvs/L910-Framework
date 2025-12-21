@@ -11,15 +11,20 @@ class GymFramework {
             PATCH: {}
         };
         this.middlewares = [];
+        this.errorHandler = null;
     }
 
     listen(port, callback) {
-        const server = http.createServer((req, res) => {
-            this.handleRequest(req, res);
+        const server = http.createServer(async (req, res) => {
+            try {
+                await this.handleRequest(req, res);
+            } catch (error) {
+                this.handleError(error, req, res);
+            }
         });
 
         server.listen(port, callback);
-        console.log(`🚀 Сервер запущен на порту ${port}`);
+        console.log(`🏋️ Сервер тренажерного зала запущен на порту ${port}`);
         return server;
     }
 
@@ -27,25 +32,25 @@ class GymFramework {
         this.initRequest(req);
         this.initResponse(res);
 
-        try {
-            await this.runMiddlewares(req, res);
-
-            const parsedUrl = url.parse(req.url, true);
-            const pathname = parsedUrl.pathname;
-            const method = req.method.toUpperCase();
-
-            const routeHandler = this.findRoute(method, pathname, req);
-
-            if (routeHandler) {
-                await routeHandler(req, res);
-            } else {
-                res.status(404).json({ 
-                    error: 'Маршрут не найден',
-                    path: pathname
+        for (const middleware of this.middlewares) {
+            await new Promise((resolve, reject) => {
+                middleware(req, res, (err) => {
+                    if (err) reject(err);
+                    else resolve();
                 });
-            }
-        } catch (error) {
-            this.handleError(error, req, res);
+            });
+        }
+
+        const parsedUrl = url.parse(req.url, true);
+        const pathname = parsedUrl.pathname;
+        const method = req.method.toUpperCase();
+
+        const routeHandler = this.findRoute(method, pathname, req);
+
+        if (routeHandler) {
+            await routeHandler(req, res);
+        } else {
+            res.status(404).json({ error: 'Маршрут не найден' });
         }
     }
 
@@ -72,16 +77,15 @@ class GymFramework {
     }
 
     convertToRegex(path) {
-        const regexPath = path.replace(/:\w+/g, '([^/]+)');
-        return new RegExp('^' + regexPath + '$');
+        return new RegExp('^' + path.replace(/:\w+/g, '([^/]+)') + '$');
     }
 
     extractParams(routePath, match) {
         const params = {};
         const paramNames = [];
-        
         const pathParts = routePath.split('/');
-        pathParts.forEach(part => {
+        
+        pathParts.forEach((part, index) => {
             if (part.startsWith(':')) {
                 paramNames.push(part.slice(1));
             }
@@ -94,55 +98,24 @@ class GymFramework {
         return params;
     }
 
-    async runMiddlewares(req, res) {
-        for (const middleware of this.middlewares) {
-            await new Promise((resolve, reject) => {
-                middleware(req, res, (err) => {
-                    if (err) reject(err);
-                    else resolve();
-                });
-            });
-        }
-    }
-
     initRequest(req) {
         const parsedUrl = url.parse(req.url, true);
         
         req.query = parsedUrl.query || {};
         req.params = {};
+        req.body = {};
         req.path = parsedUrl.pathname;
-
-        req.getBody = () => {
-            return new Promise((resolve, reject) => {
-                let body = '';
-                req.on('data', chunk => {
-                    body += chunk.toString();
-                });
-                req.on('end', () => {
-                    try {
-                        req.body = body ? JSON.parse(body) : {};
-                        resolve(req.body);
-                    } catch (error) {
-                        req.body = {};
-                        resolve({});
-                    }
-                });
-                req.on('error', reject);
-            });
-        };
     }
 
     initResponse(res) {
         res.send = (data) => {
             res.setHeader('Content-Type', 'text/plain');
             res.end(data.toString());
-            return res;
         };
 
         res.json = (data) => {
             res.setHeader('Content-Type', 'application/json');
             res.end(JSON.stringify(data, null, 2));
-            return res;
         };
 
         res.status = (code) => {
@@ -153,20 +126,24 @@ class GymFramework {
         res.setHeader('Content-Type', 'application/json');
     }
 
-    handleError(error, req, res) {
-        console.error('Ошибка:', error);
-        
-        if (!res.headersSent) {
-            res.status(500).json({
-                error: 'Ошибка сервера',
-                message: error.message
-            });
-        }
-    }
-
     use(middleware) {
         if (typeof middleware === 'function') {
             this.middlewares.push(middleware);
+        }
+    }
+
+    useErrorHandler(handler) {
+        this.errorHandler = handler;
+    }
+
+    handleError(error, req, res) {
+        if (this.errorHandler) {
+            this.errorHandler(error, req, res);
+        } else {
+            res.status(500).json({ 
+                error: 'Внутренняя ошибка сервера',
+                message: error.message 
+            });
         }
     }
 
@@ -182,12 +159,12 @@ class GymFramework {
         this.routes.PUT[path] = handler;
     }
 
-    delete(path, handler) {
-        this.routes.DELETE[path] = handler;
-    }
-
     patch(path, handler) {
         this.routes.PATCH[path] = handler;
+    }
+
+    delete(path, handler) {
+        this.routes.DELETE[path] = handler;
     }
 }
 

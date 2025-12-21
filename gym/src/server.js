@@ -1,61 +1,100 @@
 const GymFramework = require('./framework');
+const bodyParser = require('./middleware/bodyParser');
+const errorHandler = require('./middleware/errorHandler');
+const MembersController = require('./controllers/membersController');
+const TrainersController = require('./controllers/trainersController');
+const path = require('path');
+const fs = require('fs').promises;
 
+// Создаем экземпляр нашего фреймворка
 const app = new GymFramework();
 
-app.use((req, res, next) => {
-    console.log(`${new Date().toISOString()} ${req.method} ${req.path}`);
-    next();
-});
+// Middleware
+app.use(bodyParser);
 
+// CORS middleware
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    
+    if (req.method === 'OPTIONS') {
+        res.status(200).end();
+        return;
+    }
+    
     next();
 });
 
-app.get('/', (req, res) => {
-    res.json({
-        message: 'Добро пожаловать в L910 Framework v1.0!',
-        version: '1.0.0',
-        endpoints: [
-            { method: 'GET', path: '/test' },
-            { method: 'GET', path: '/users/:id' },
-            { method: 'POST', path: '/data' }
-        ]
-    });
+// Маршруты для клиентов (Members)
+app.get('/api/members', MembersController.getAll);
+app.get('/api/members/:id', MembersController.getById);
+app.post('/api/members', MembersController.create);
+app.put('/api/members/:id', MembersController.update);
+app.patch('/api/members/:id', MembersController.patch);
+app.delete('/api/members/:id', MembersController.delete);
+app.get('/api/members/active', MembersController.getActive);
+app.get('/api/members/type/:type', MembersController.getByMembershipType);
+
+// Маршруты для тренеров (Trainers)
+app.get('/api/trainers', TrainersController.getAll);
+app.get('/api/trainers/:id', TrainersController.getById);
+app.post('/api/trainers', TrainersController.create);
+app.put('/api/trainers/:id', TrainersController.update);
+app.patch('/api/trainers/:id', TrainersController.patch);
+app.delete('/api/trainers/:id', TrainersController.delete);
+app.get('/api/trainers/available', TrainersController.getAvailable);
+app.get('/api/trainers/specialization/:spec', TrainersController.getBySpecialization);
+
+// Статические файлы
+app.use(async (req, res, next) => {
+    if (req.method === 'GET' && req.path.startsWith('/public/')) {
+        try {
+            const filePath = path.join(__dirname, '..', req.path);
+            const data = await fs.readFile(filePath);
+            
+            // Определяем Content-Type
+            const ext = path.extname(filePath);
+            const mimeTypes = {
+                '.html': 'text/html',
+                '.css': 'text/css',
+                '.js': 'application/javascript',
+                '.json': 'application/json',
+                '.png': 'image/png',
+                '.jpg': 'image/jpeg'
+            };
+            
+            res.setHeader('Content-Type', mimeTypes[ext] || 'text/plain');
+            res.end(data);
+        } catch (error) {
+            if (error.code === 'ENOENT') {
+                res.status(404).json({ error: 'Файл не найден' });
+            } else {
+                next(error);
+            }
+        }
+    } else if (req.method === 'GET' && (req.path === '/' || req.path === '/index.html')) {
+        try {
+            const filePath = path.join(__dirname, '../public/index.html');
+            const data = await fs.readFile(filePath);
+            res.setHeader('Content-Type', 'text/html');
+            res.end(data);
+        } catch (error) {
+            next(error);
+        }
+    } else {
+        next();
+    }
 });
 
-app.get('/test', (req, res) => {
-    res.json({
-        success: true,
-        message: 'Фреймворк работает!',
-        timestamp: new Date().toISOString()
-    });
-});
+// Обработчик ошибок
+app.useErrorHandler(errorHandler);
 
-app.get('/users/:id', (req, res) => {
-    res.json({
-        userId: req.params.id,
-        query: req.query
-    });
-});
-
-app.post('/data', async (req, res) => {
-    const body = await req.getBody();
-    res.status(201).json({
-        success: true,
-        received: body
-    });
-});
-
-app.get('/error', (req, res) => {
-    throw new Error('Тестовая ошибка');
-});
-
-const PORT = 3000;
+// Запуск сервера
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log('='.repeat(50));
-    console.log('L910 FRAMEWORK v1.0');
-    console.log(`Сервер: http://localhost:${PORT}`);
-    console.log('='.repeat(50));
+    console.log(`✅ Сервер запущен: http://localhost:${PORT}`);
+    console.log(`👤 Клиенты API: http://localhost:${PORT}/api/members`);
+    console.log(`🏋️ Тренеры API: http://localhost:${PORT}/api/trainers`);
+    console.log(`🌐 Фронтенд: http://localhost:${PORT}`);
 });

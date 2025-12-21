@@ -1,12 +1,15 @@
 {
-  "name": "l910-framework-v1",
-  "version": "1.0.0",
-  "description": "Базовый веб-фреймворк на Node.js",
+  "name": "l910-framework",
+  "version": "2.0.0",
+  "description": "Веб-фреймворк для тренажерного зала",
   "main": "src/server.js",
   "scripts": {
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
   },
-  "keywords": ["framework", "nodejs"],
-  "author": "",
-  "license": "MIT"
+  "keywords": ["framework", "nodejs", "gym"],
+  "author": "Ваше Имя",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {}
 }

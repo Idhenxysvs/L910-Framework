@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concert API Test</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f0f2f5; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { margin-bottom: 20px; color: #333; }
+        .api-section { background: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .endpoint { background: #f8f9fa; padding: 10px; border-radius: 4px; margin: 10px 0; font-family: monospace; }
+        .btn { background: #007bff; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-right: 10px; }
+        .btn:hover { background: #0056b3; }
+        .response { margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 4px; font-family: monospace; white-space: pre-wrap; max-height: 300px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 Concert API Test Interface</h1>
+        
+        <!-- Концерты -->
+        <div class="api-section">
+            <h2>Concerts API</h2>
+            <div class="endpoint">GET /concerts</div>
+            <button class="btn" onclick="getConcerts()">Get All Concerts</button>
+            <button class="btn" onclick="createConcert()">Create Concert</button>
+            <div id="concertsResponse" class="response"></div>
+        </div>
+
+        <!-- Артисты -->
+        <div class="api-section">
+            <h2>Artists API</h2>
+            <div class="endpoint">GET /artists</div>
+            <button class="btn" onclick="getArtists()">Get All Artists</button>
+            <button class="btn" onclick="createArtist()">Create Artist</button>
+            <div id="artistsResponse" class="response"></div>
+        </div>
+
+        <!-- Статус сервера -->
+        <div class="api-section">
+            <h2>Server Status</h2>
+            <button class="btn" onclick="checkStatus()">Check Server</button>
+            <div id="statusResponse" class="response"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '';
+        
+        async function getConcerts() {
+            try {
+                const response = await fetch('/concerts');
+                const data = await response.json();
+                document.getElementById('concertsResponse').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('concertsResponse').textContent = 'Error: ' + error.message;
+            }
+        }
+
+        async function getArtists() {
+            try {
+                const response = await fetch('/artists');
+                const data = await response.json();
+                document.getElementById('artistsResponse').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('artistsResponse').textContent = 'Error: ' + error.message;
+            }
+        }
+
+        async function createConcert() {
+            const concertData = {
+                title: "Test Concert " + Date.now(),
+                artistId: 1,
+                date: new Date().toISOString(),
+                venue: "Test Venue",
+                price: 50.00,
+                soldOut: false,
+                genres: ["Rock", "Pop"]
+            };
+
+            try {
+                const response = await fetch('/concerts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(concertData)
+                });
+                const data = await response.json();
+                document.getElementById('concertsResponse').textContent = 'Created: ' + JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('concertsResponse').textContent = 'Error: ' + error.message;
+            }
+        }
+
+        async function createArtist() {
+            const artistData = {
+                name: "Test Artist " + Date.now(),
+                country: "Test Country",
+                active: true,
+                albumCount: 3,
+                popularity: 7.5
+            };
+
+            try {
+                const response = await fetch('/artists', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(artistData)
+                });
+                const data = await response.json();
+                document.getElementById('artistsResponse').textContent = 'Created: ' + JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('artistsResponse').textContent = 'Error: ' + error.message;
+            }
+        }
+
+        async function checkStatus() {
+            try {
+                const response = await fetch('/');
+                const text = await response.text();
+                document.getElementById('statusResponse').textContent = 'Server is running!\n' + text.substring(0, 200) + '...';
+            } catch (error) {
+                document.getElementById('statusResponse').textContent = 'Error: ' + error.message;
+            }
+        }
+
+        // Загружаем данные при старте
+        window.onload = function() {
+            getConcerts();
+            getArtists();
+        };
+    </script>
+</body>
+</html>

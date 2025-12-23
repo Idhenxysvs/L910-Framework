@@ -1,11 +1,9 @@
 const L910Framework = require('./framework');
+const ClientsController = require('./controllers/clientsController');
+const path = require('path');
+const fs = require('fs').promises;
 
 const app = new L910Framework();
-
-app.use((req, res, next) => {
-    console.log(`${new Date().toISOString()} ${req.method} ${req.url}`);
-    next();
-});
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -18,82 +16,36 @@ app.use((req, res, next) => {
     next();
 });
 
-app.get('/', (req, res) => {
-    res.json({
-        message: 'Банковский фреймворк v1.0',
-        version: '1.0.0',
-        endpoints: [
-            { method: 'GET', path: '/test', description: 'Тестовый маршрут' },
-            { method: 'GET', path: '/demo/clients', description: 'Демо клиенты' },
-            { method: 'GET', path: '/demo/accounts', description: 'Демо счета' },
-            { method: 'POST', path: '/demo/data', description: 'Демо POST запрос' }
-        ],
-    });
-});
+app.get('/api/clients', ClientsController.getAll);
+app.get('/api/clients/:id', ClientsController.getById);
+app.post('/api/clients', ClientsController.create);
+app.put('/api/clients/:id', ClientsController.update);
+app.patch('/api/clients/:id', ClientsController.patch);
+app.delete('/api/clients/:id', ClientsController.delete);
+app.get('/api/clients/active', ClientsController.getActive);
+app.get('/api/clients/type/:type', ClientsController.getByType);
+app.get('/api/clients/:id/edit-form', ClientsController.getEditForm);
 
-app.get('/test', (req, res) => {
-    res.json({
-        success: true,
-        message: 'Банковский фреймворк работает!',
-        timestamp: new Date().toISOString()
-    });
-});
-
-app.get('/demo/clients', (req, res) => {
-    res.json([
-        { id: 'C1', fullName: 'Иванов Иван Иванович', type: 'individual' },
-        { id: 'C2', fullName: 'Петрова Анна Сергеевна', type: 'vip' }
-    ]);
-});
-
-app.get('/demo/accounts', (req, res) => {
-    res.json([
-        { id: 'A1', accountNumber: '40702810123456789012', balance: 100000 },
-        { id: 'A2', accountNumber: '40817810234567890123', balance: 50000 }
-    ]);
-});
-
-app.post('/demo/data', async (req, res) => {
-    try {
-        let body = '';
-        req.on('data', chunk => body += chunk.toString());
-        req.on('end', () => {
-            try {
-                const parsedBody = body ? JSON.parse(body) : {};
-                res.status(201).json({
-                    success: true,
-                    received: parsedBody,
-                    message: 'Данные получены в банковской системе'
-                });
-            } catch {
-                res.status(400).json({ error: 'Invalid JSON' });
+app.use(async (req, res, next) => {
+    if (req.method === 'GET' && req.path === '/') {
+        res.json({
+            message: 'Банковская система API',
+            note: 'API.',
+            endpoints: {
+                clients: '/api/clients'
             }
         });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+    } else {
+        next();
     }
 });
 
-app.get('/demo/clients/:id', (req, res) => {
-    res.json({
-        clientId: req.params.id,
-        query: req.query,
-        message: `Демо клиент ${req.params.id}`,
-        data: {
-            id: req.params.id,
-            fullName: 'Тестовый Клиент',
-            clientType: 'individual'
-        }
-    });
-});
-
-const PORT = 3001;
+const PORT = process.env.PORT || 3002;
 app.listen(PORT, () => {
     console.log('='.repeat(50));
-    console.log('БАНКОВСКИЙ ФРЕЙМВОРК v1.0');
+    console.log('БАНКОВСКАЯ СИСТЕМА');
     console.log('='.repeat(50));
     console.log(`Сервер запущен: http://localhost:${PORT}`);
-    console.log(`Документация: http://localhost:${PORT}/`);
-    console.log(`Тест API: http://localhost:${PORT}/test`);
+    console.log(`Клиенты API: http://localhost:${PORT}/api/clients`);
     console.log('='.repeat(50));
 });

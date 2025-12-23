@@ -1,0 +1,54 @@
+[
+  {
+    "id": "C1",
+    "fullName": "Іваноў Іван Іванавіч",
+    "passport": "BM1234567",
+    "birthDate": "1985-05-15T00:00:00.000Z",
+    "address": "г. Мінск, вул. Кальварыйская, д. 25, кв. 17",
+    "phone": "+375 (29) 123-45-67",
+    "email": "ivanou@example.com",
+    "clientType": "individual",
+    "registrationDate": "2020-01-15T10:00:00.000Z",
+    "isActive": true,
+    "creditRating": 85,
+    "income": 50000,
+    "accountIds": [
+      "A1",
+      "A2"
+    ]
+  },
+  {
+    "id": "C2",
+    "fullName": "Пятрова Ганна Сяргееўна",
+    "passport": "BM7654321",
+    "birthDate": "1990-08-22T00:00:00.000Z",
+    "address": "г. Гродна, вул. Савецкая, д. 12, кв. 8",
+    "phone": "+375 (29) 987-65-43",
+    "email": "patrova@example.com",
+    "clientType": "vip",
+    "registrationDate": "2021-03-10T14:30:00.000Z",
+    "isActive": true,
+    "creditRating": 95,
+    "income": 150000,
+    "accountIds": [
+      "A3"
+    ]
+  },
+  {
+    "id": "C3",
+    "fullName": "ТАА 'Рамонак'",
+    "passport": "",
+    "birthDate": "2015-11-05T00:00:00.000Z",
+    "address": "г. Віцебск, вул. Маскоўская, д. 7, офіс 301",
+    "phone": "+375 (33) 222-33-44",
+    "email": "info@ramonak.by",
+    "clientType": "business",
+    "registrationDate": "2018-06-20T09:15:00.000Z",
+    "isActive": true,
+    "creditRating": 75,
+    "income": 500000,
+    "accountIds": [
+      "A4"
+    ]
+  }
+]

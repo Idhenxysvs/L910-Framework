@@ -1,0 +1,73 @@
+[
+  {
+    "id": "A1",
+    "accountNumber": "40702810123456789012",
+    "clientId": "C1",
+    "accountType": "checking",
+    "balance": 125000.50,
+    "currency": "BYN",
+    "openingDate": "2020-01-15T10:00:00.000Z",
+    "isActive": true,
+    "interestRate": 0,
+    "transactions": [
+      {
+        "date": "2024-01-15T10:00:00.000Z",
+        "type": "deposit",
+        "amount": 100000,
+        "description": "Первоначальный взнос",
+        "balanceAfter": 100000
+      },
+      {
+        "date": "2024-02-01T14:30:00.000Z",
+        "type": "deposit",
+        "amount": 25000.50,
+        "description": "Зарплата",
+        "balanceAfter": 125000.50
+      }
+    ]
+  },
+  {
+    "id": "A2",
+    "accountNumber": "40817810234567890123",
+    "clientId": "C1",
+    "accountType": "savings",
+    "balance": 50000,
+    "currency": "BYN",
+    "openingDate": "2021-05-20T11:00:00.000Z",
+    "isActive": true,
+    "interestRate": 5.5,
+    "transactions": [
+      {
+        "date": "2024-01-20T11:00:00.000Z",
+        "type": "deposit",
+        "amount": 50000,
+        "description": "Открытие накопительного счета",
+        "balanceAfter": 50000
+      }
+    ]
+  },
+  {
+    "id": "A3",
+    "accountNumber": "40702810345678901234",
+    "clientId": "C2",
+    "accountType": "checking",
+    "balance": 300000,
+    "currency": "BYN",
+    "openingDate": "2021-03-10T14:30:00.000Z",
+    "isActive": true,
+    "interestRate": 0,
+    "transactions": []
+  },
+  {
+    "id": "A4",
+    "accountNumber": "40702810456789012345",
+    "clientId": "C3",
+    "accountType": "checking",
+    "balance": 1000000,
+    "currency": "BYN",
+    "openingDate": "2018-06-20T09:15:00.000Z",
+    "isActive": true,
+    "interestRate": 0,
+    "transactions": []
+  }
+]

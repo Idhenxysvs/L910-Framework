@@ -119,6 +119,17 @@ class TrainersController {
             res.status(500).json({ error: error.message });
         }
     }
+
+    // GET /api/trainers/top-rated - тренеры с высоким рейтингом
+    static async getTopRated(req, res) {
+        try {
+            const limit = parseInt(req.query.limit) || 5;
+            const trainers = await Trainer.getTopRated(limit);
+            res.json(trainers);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
 }
 
 module.exports = TrainersController;

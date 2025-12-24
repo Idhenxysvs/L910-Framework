@@ -1,5 +1,6 @@
 const fs = require('fs').promises;
 const path = require('path');
+const Review = require('./Review');
 
 class Trainer {
     constructor(data = {}) {
@@ -114,6 +115,32 @@ class Trainer {
     static async findBySpecialization(specialization) {
         const trainers = await this.findAll();
         return trainers.filter(trainer => trainer.specialization === specialization);
+    }
+
+    // Получить тренеров с высоким рейтингом
+    static async getTopRated(limit = 5) {
+        const trainers = await this.findAll();
+        return trainers
+            .sort((a, b) => b.rating - a.rating)
+            .slice(0, limit);
+    }
+
+    // Обновить рейтинг тренера на основе отзывов
+    static async updateRating(trainerId) {
+        const reviews = await Review.findByTrainer(trainerId);
+        const trainer = await this.findById(trainerId);
+        
+        if (!trainer) return null;
+        
+        if (reviews.length === 0) {
+            trainer.rating = 0;
+        } else {
+            const sumRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+            trainer.rating = Math.round((sumRating / reviews.length) * 10) / 10;
+        }
+        
+        await this.update(trainerId, { rating: trainer.rating });
+        return trainer;
     }
 }
 

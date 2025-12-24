@@ -3,6 +3,8 @@ const bodyParser = require('./middleware/bodyParser');
 const errorHandler = require('./middleware/errorHandler');
 const MembersController = require('./controllers/membersController');
 const TrainersController = require('./controllers/trainersController');
+const AppointmentsController = require('./controllers/appointmentsController');
+const ReviewsController = require('./controllers/reviewsController');
 const path = require('path');
 const fs = require('fs').promises;
 
@@ -15,7 +17,7 @@ app.use(bodyParser);
 // CORS middleware
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     
     if (req.method === 'OPTIONS') {
@@ -45,6 +47,28 @@ app.patch('/api/trainers/:id', TrainersController.patch);
 app.delete('/api/trainers/:id', TrainersController.delete);
 app.get('/api/trainers/available', TrainersController.getAvailable);
 app.get('/api/trainers/specialization/:spec', TrainersController.getBySpecialization);
+app.get('/api/trainers/top-rated', TrainersController.getTopRated);
+
+// Маршруты для записей (Appointments)
+app.get('/api/appointments', AppointmentsController.getAll);
+app.get('/api/appointments/:id', AppointmentsController.getById);
+app.post('/api/appointments', AppointmentsController.create);
+app.put('/api/appointments/:id', AppointmentsController.update);
+app.patch('/api/appointments/:id', AppointmentsController.patch);
+app.delete('/api/appointments/:id', AppointmentsController.delete);
+app.get('/api/appointments/member/:memberId', AppointmentsController.getByMember);
+app.get('/api/appointments/trainer/:trainerId', AppointmentsController.getByTrainer);
+app.get('/api/appointments/date/:date', AppointmentsController.getByDate);
+app.get('/api/appointments/upcoming', AppointmentsController.getUpcoming);
+
+// Маршруты для отзывов (Reviews)
+app.get('/api/reviews', ReviewsController.getAll);
+app.get('/api/reviews/:id', ReviewsController.getById);
+app.post('/api/reviews', ReviewsController.create);
+app.put('/api/reviews/:id', ReviewsController.update);
+app.delete('/api/reviews/:id', ReviewsController.delete);
+app.get('/api/reviews/trainer/:trainerId', ReviewsController.getByTrainer);
+app.get('/api/reviews/member/:memberId', ReviewsController.getByMember);
 
 // Статические файлы
 app.use(async (req, res, next) => {
@@ -96,5 +120,7 @@ app.listen(PORT, () => {
     console.log(`✅ Сервер запущен: http://localhost:${PORT}`);
     console.log(`👤 Клиенты API: http://localhost:${PORT}/api/members`);
     console.log(`🏋️ Тренеры API: http://localhost:${PORT}/api/trainers`);
+    console.log(`📅 Записи API: http://localhost:${PORT}/api/appointments`);
+    console.log(`⭐ Отзывы API: http://localhost:${PORT}/api/reviews`);
     console.log(`🌐 Фронтенд: http://localhost:${PORT}`);
 });

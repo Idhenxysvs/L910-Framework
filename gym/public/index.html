@@ -12,17 +12,26 @@
         <header>
             <div class="header-content">
                 <h1><i class="fas fa-dumbbell"></i> Тренажерный зал "Силач"</h1>
-                <p class="subtitle">Система управления клиентами и тренерами</p>
+                <p class="subtitle">Система управления клиентами, тренерами и записями</p>
             </div>
         </header>
 
         <nav>
             <div class="nav-buttons">
-                <button class="nav-btn active" data-section="members">
+                <button class="nav-btn active" data-section="dashboard">
+                    <i class="fas fa-chart-line"></i> Дашборд
+                </button>
+                <button class="nav-btn" data-section="members">
                     <i class="fas fa-users"></i> Клиенты
                 </button>
                 <button class="nav-btn" data-section="trainers">
                     <i class="fas fa-user-tie"></i> Тренеры
+                </button>
+                <button class="nav-btn" data-section="appointments">
+                    <i class="fas fa-calendar-alt"></i> Записи
+                </button>
+                <button class="nav-btn" data-section="reviews">
+                    <i class="fas fa-star"></i> Отзывы
                 </button>
                 <button class="nav-btn" data-section="add-member">
                     <i class="fas fa-user-plus"></i> Добавить клиента
@@ -30,15 +39,90 @@
                 <button class="nav-btn" data-section="add-trainer">
                     <i class="fas fa-chalkboard-teacher"></i> Добавить тренера
                 </button>
+                <button class="nav-btn" data-section="add-appointment">
+                    <i class="fas fa-calendar-plus"></i> Новая запись
+                </button>
             </div>
         </nav>
 
         <main>
+            <!-- Секция дашборда -->
+            <section id="dashboard" class="content-section active">
+                <div class="section-header">
+                    <h2><i class="fas fa-chart-line"></i> Дашборд</h2>
+                    <div class="controls">
+                        <button class="btn secondary" onclick="loadDashboard()">
+                            <i class="fas fa-sync-alt"></i> Обновить
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="dashboard-cards">
+                    <div class="dashboard-card">
+                        <div class="card-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3 id="total-members">0</h3>
+                            <p>Всего клиентов</p>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <div class="card-icon">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3 id="total-trainers">0</h3>
+                            <p>Всего тренеров</p>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <div class="card-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3 id="today-appointments">0</h3>
+                            <p>Записей сегодня</p>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-card">
+                        <div class="card-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3 id="total-reviews">0</h3>
+                            <p>Всего отзывов</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dashboard-sections">
+                    <div class="dashboard-section">
+                        <h3><i class="fas fa-calendar-check"></i> Ближайшие записи</h3>
+                        <div id="upcoming-appointments" class="dashboard-list"></div>
+                    </div>
+                    
+                    <div class="dashboard-section">
+                        <h3><i class="fas fa-trophy"></i> Топ тренеры</h3>
+                        <div id="top-trainers" class="dashboard-list"></div>
+                    </div>
+                </div>
+            </section>
+
             <!-- Секция клиентов -->
-            <section id="members" class="content-section active">
+            <section id="members" class="content-section">
                 <div class="section-header">
                     <h2><i class="fas fa-users"></i> Наши клиенты</h2>
                     <div class="controls">
+                        <div class="search-box">
+                            <input type="text" id="members-search" placeholder="Поиск по имени или email...">
+                            <button class="btn secondary" onclick="searchMembers()">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
                         <button class="btn secondary" onclick="loadMembers()">
                             <i class="fas fa-sync-alt"></i> Обновить
                         </button>
@@ -55,6 +139,12 @@
                 <div class="section-header">
                     <h2><i class="fas fa-user-tie"></i> Наши тренеры</h2>
                     <div class="controls">
+                        <div class="search-box">
+                            <input type="text" id="trainers-search" placeholder="Поиск по имени или специализации...">
+                            <button class="btn secondary" onclick="searchTrainers()">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
                         <button class="btn secondary" onclick="loadTrainers()">
                             <i class="fas fa-sync-alt"></i> Обновить
                         </button>
@@ -64,6 +154,49 @@
                     </div>
                 </div>
                 <div class="cards-container" id="trainers-container"></div>
+            </section>
+
+            <!-- Секция записей -->
+            <section id="appointments" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-calendar-alt"></i> Записи на тренировки</h2>
+                    <div class="controls">
+                        <div class="date-filter">
+                            <input type="date" id="appointment-date" value="">
+                            <button class="btn secondary" onclick="filterAppointmentsByDate()">
+                                <i class="fas fa-filter"></i> Фильтр
+                            </button>
+                        </div>
+                        <button class="btn secondary" onclick="loadAppointments()">
+                            <i class="fas fa-sync-alt"></i> Обновить
+                        </button>
+                        <button class="btn primary" onclick="showUpcomingAppointments()">
+                            <i class="fas fa-clock"></i> Предстоящие
+                        </button>
+                    </div>
+                </div>
+                <div class="cards-container" id="appointments-container"></div>
+            </section>
+
+            <!-- Секция отзывов -->
+            <section id="reviews" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-star"></i> Отзывы о тренерах</h2>
+                    <div class="controls">
+                        <div class="trainer-filter">
+                            <select id="review-trainer-filter">
+                                <option value="">Все тренеры</option>
+                            </select>
+                            <button class="btn secondary" onclick="filterReviewsByTrainer()">
+                                <i class="fas fa-filter"></i> Фильтр
+                            </button>
+                        </div>
+                        <button class="btn secondary" onclick="loadReviews()">
+                            <i class="fas fa-sync-alt"></i> Обновить
+                        </button>
+                    </div>
+                </div>
+                <div class="cards-container" id="reviews-container"></div>
             </section>
 
             <!-- Форма добавления/редактирования клиента -->
@@ -221,11 +354,74 @@
                     </form>
                 </div>
             </section>
+
+            <!-- Форма добавления/редактирования записи -->
+            <section id="add-appointment" class="content-section">
+                <div class="form-container">
+                    <h2><i class="fas fa-calendar-plus"></i> <span id="appointment-form-title">Новая запись</span></h2>
+                    <form id="appointment-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="appointmentMemberId"><i class="fas fa-user"></i> Клиент:</label>
+                                <select id="appointmentMemberId" required>
+                                    <option value="">Выберите клиента</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="appointmentTrainerId"><i class="fas fa-user-tie"></i> Тренер:</label>
+                                <select id="appointmentTrainerId" required>
+                                    <option value="">Выберите тренера</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="appointmentDate"><i class="fas fa-calendar"></i> Дата:</label>
+                                <input type="date" id="appointmentDate" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="appointmentTime"><i class="fas fa-clock"></i> Время:</label>
+                                <input type="time" id="appointmentTime" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="appointmentDuration"><i class="fas fa-hourglass-half"></i> Длительность (мин):</label>
+                                <input type="number" id="appointmentDuration" min="30" max="180" step="30" value="60" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="appointmentStatus"><i class="fas fa-info-circle"></i> Статус:</label>
+                                <select id="appointmentStatus" required>
+                                    <option value="scheduled">Запланирована</option>
+                                    <option value="completed">Завершена</option>
+                                    <option value="cancelled">Отменена</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="appointmentNotes"><i class="fas fa-sticky-note"></i> Примечания:</label>
+                            <textarea id="appointmentNotes" placeholder="Дополнительная информация о тренировке..." rows="3"></textarea>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn success" id="appointment-submit-btn">
+                                <i class="fas fa-check"></i> Добавить запись
+                            </button>
+                            <button type="button" class="btn danger" id="cancel-appointment-btn">
+                                <i class="fas fa-times"></i> Отмена
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
         </main>
 
         <footer>
-            <p>© 2025 Тренажерный зал "Силач" | Собственный Node.js фреймворк</p>
-            <p class="api-info">API: /api/members и /api/trainers</p>
+            <p>© 2024 Тренажерный зал "Силач" | Собственный Node.js фреймворк</p>
+            <p class="api-info">API: /api/members, /api/trainers, /api/appointments, /api/reviews</p>
         </footer>
     </div>
 

@@ -1,21 +1,13 @@
 {
-  "name": "concert-schedule-manager",
-  "description": "Веб сайт управления концертами, артистами и расписанием концертов",
+  "name": "concert-manager",
+  "version": "1.0.0",
+  "description": "Управление расписанием концертов и артистов",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js"
   },
-  "keywords": [
-    "concerts",
-    "schedule",
-    "music",
-    "events"
-  ],
+  "keywords": ["concerts", "schedule", "music", "events"],
   "author": "",
-  "license": "MIT",
-  "version": "1.0.0",
-  "devDependencies": {
-    "nodeman": "^1.1.2"
-  }
+  "license": "MIT"
 }

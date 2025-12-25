@@ -10,9 +10,14 @@ class ConcertManager {
   async init() {
     this.bindEvents();
     this.loadTheme();
-    await this.loadStats();
-    await this.loadConcerts();
+
     await this.loadArtists();
+
+    await this.loadConcerts();    
+    
+    await this.loadStats();
+    
+    
     this.updateUI();
     this.switchView('concerts');
   }
@@ -47,6 +52,7 @@ class ConcertManager {
     document.querySelectorAll('.btn-cancel').forEach(btn => {
       btn.addEventListener('click', () => this.switchView('concerts'));
     });
+
     document.getElementById('themeToggle').addEventListener('click', () => this.toggleTheme());
   }
 
@@ -325,17 +331,37 @@ class ConcertManager {
     };
 
     try {
-      await this.apiRequest('/concerts', {
+      const concertResponse = await this.apiRequest('/concerts', {
         method: 'POST',
         body: JSON.stringify(formData)
       });
 
+      const newConcert = concertResponse.data;
+      
+      const artistResponse = await this.apiRequest(`/artists/${formData.artistId}`);
+      const artist = artistResponse.data;
+      
+      const updatedConcerts = artist.upcomingConcerts || [];
+      if (!updatedConcerts.includes(newConcert.id)) {
+        updatedConcerts.push(newConcert.id);
+        
+        await this.apiRequest(`/artists/${formData.artistId}`, {
+          method: 'PUT',
+          body: JSON.stringify({
+            ...artist,
+            upcomingConcerts: updatedConcerts
+          })
+        });
+      }
+
       this.showNotification('🎉 Концерт успешно создан!');
       document.getElementById('createConcertForm').reset();
       await this.loadConcerts();
+      await this.loadArtists();
       await this.loadStats();
       this.switchView('concerts');
     } catch (error) {
+      console.error('Error:', error);
       this.showNotification('❌ Ошибка создания концерта', 'error');
     }
   }
@@ -530,21 +556,26 @@ class ConcertManager {
 
   switchView(view) {
     this.currentView = view;
+    
     window.scrollTo({ top: 0, behavior: 'smooth' });
-        document.querySelectorAll('.nav-tab').forEach(tab => {
+    
+    document.querySelectorAll('.nav-tab').forEach(tab => {
       tab.classList.toggle('active', tab.dataset.view === view);
     });
+    
     document.querySelectorAll('.control-card').forEach(card => {
       card.classList.toggle('active', card.dataset.action === view);
     });
+    
     document.querySelectorAll('.form-section').forEach(section => {
       section.classList.remove('active');
     });
+    
     document.getElementById('concertsSection').style.display = 
       (view === 'concerts' || view === 'createConcert' || view === 'editConcert') ? 'block' : 'none';
     document.getElementById('artistsSection').style.display = 
       (view === 'artists' || view === 'createArtist' || view === 'editArtist') ? 'block' : 'none';
-
+    
     if (view === 'createConcert') {
       document.getElementById('createConcertFormSection').classList.add('active');
     } else if (view === 'createArtist') {
@@ -554,6 +585,7 @@ class ConcertManager {
     } else if (view === 'editArtist') {
       document.getElementById('editArtistFormSection').classList.add('active');
     }
+    
     if (view === 'concerts') {
       document.querySelector('#concertsSection h2').innerHTML = '<i class="fas fa-calendar-alt"></i> Расписание концертов';
     } else if (view === 'artists') {

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ConcertFlow • Управление концертами</title>
-    <link rel="stylesheet" href="/public/style.css">
+    <link rel="stylesheet" href="public/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -13,12 +13,7 @@
         <div class="header-content">
             <div class="logo">
                 <i class="fas fa-wave-square"></i>
-                <span>Concert<span style="color: #3b82f6;">Flow</span></span>
-            </div>
-            <div class="theme-toggle">
-                <button id="themeToggle" class="theme-btn" title="Сменить тему">
-                    <i id="themeIcon" class="fas fa-palette"></i>
-                </button>
+                <span>Concert<span class="logo-accent">Flow</span></span>
             </div>
             
             <div class="stats">
@@ -37,6 +32,12 @@
             </div>
         </div>
     </header>
+
+    <div class="theme-toggle">
+        <button id="themeToggle" class="theme-btn" title="Сменить тему">
+            <i id="themeIcon" class="fas fa-palette"></i>
+        </button>
+    </div>
 
     <div class="container">
         <div class="main-grid">
@@ -402,7 +403,6 @@
             </div>
         </div>
     </footer>
-
     <script src="/public/script.js"></script>
 </body>
 </html>

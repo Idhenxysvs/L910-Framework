@@ -1,7 +1,7 @@
 {
   "name": "concert-manager",
   "version": "1.0.0",
-  "description": "Управление расписанием концертов и артистов",
+  "description": "ПАНЕЛЬ управления концертов и артистов",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",

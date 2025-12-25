@@ -3,138 +3,292 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Расписание концертов - Веб-фреймворк на Node.js</title>
-    <link rel="stylesheet" href="style.css">
+    <title>ConcertFlow • Система управления концертами</title>
+    <link rel="stylesheet" href="/public/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-wave-square"></i>
+                <span>Concert<span style="color: #e94560;">Flow</span></span>
+            </div>
+            
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="totalConcerts">0</div>
+                    <div class="stat-label">Концертов</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="totalArtists">0</div>
+                    <div class="stat-label">Артистов</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="upcomingConcerts">0</div>
+                    <div class="stat-label">Скоро</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
     <div class="container">
-        <header>
-            <h1>Расписание концертов</h1>
-            <p class="subtitle">Веб-фреймворк на NODEJS – ЧВК</p>
-            <p>Вариант 11 | Групповой проект</p>
-        </header>
-
-        <main>
-            <section class="section">
-                <h2>Управление концертами</h2>
+        <div class="dashboard">
+            <aside class="control-panel">
+                <h2><i class="fas fa-sliders-h"></i> Панель управления</h2>
                 
-                <div class="form-group">
-                    <label for="concertId">Выбрать концерт:</label>
-                    <select id="concertId">
-                        <option value="">Загрузка...</option>
-                    </select>
+                <div class="section-tabs">
+                    <button class="tab-btn active" data-tab="create">
+                        <i class="fas fa-plus"></i> Создать
+                    </button>
+                    <button class="tab-btn" data-tab="update">
+                        <i class="fas fa-edit"></i> Редактировать
+                    </button>
+                    <button class="tab-btn" data-tab="concerts">
+                        <i class="fas fa-music"></i> Концерты
+                    </button>
+                    <button class="tab-btn" data-tab="artists">
+                        <i class="fas fa-user"></i> Артисты
+                    </button>
                 </div>
 
-                <div class="form-group">
-                    <label for="concertTitle">Название концерта:</label>
-                    <input type="text" id="concertTitle" placeholder="Введите название">
+                <!-- Создание -->
+                <div id="createTab" class="tab-content active">
+                    <form id="createConcertForm">
+                        <div class="form-group">
+                            <label for="concertTitle"><i class="fas fa-heading"></i> Название концерта</label>
+                            <input type="text" id="concertTitle" class="form-control" 
+                                   placeholder="Введите название концерта" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="concertArtistId"><i class="fas fa-user"></i> Артист</label>
+                            <select id="concertArtistId" class="form-control" required>
+                                <option value="">Выберите артиста...</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="concertDate"><i class="fas fa-calendar"></i> Дата и время</label>
+                            <input type="datetime-local" id="concertDate" class="form-control" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="concertVenue"><i class="fas fa-map-marker-alt"></i> Место проведения</label>
+                            <input type="text" id="concertVenue" class="form-control" 
+                                   placeholder="Введите место проведения">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="concertPrice"><i class="fas fa-tag"></i> Цена билета ($)</label>
+                            <input type="number" id="concertPrice" class="form-control" 
+                                   placeholder="0.00" step="0.01" min="0">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="concertSoldOut"><i class="fas fa-ticket-alt"></i> Статус</label>
+                            <select id="concertSoldOut" class="form-control">
+                                <option value="false">Билеты в продаже</option>
+                                <option value="true">Распродан</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="concertGenres"><i class="fas fa-guitar"></i> Жанры (через запятую)</label>
+                            <input type="text" id="concertGenres" class="form-control" 
+                                   placeholder="Rock, Pop, Jazz">
+                        </div>
+                        
+                        <button type="submit" class="btn">
+                            <i class="fas fa-plus-circle"></i> Создать концерт
+                        </button>
+                    </form>
+                    
+                    <hr style="margin: 20px 0; border-color: var(--border);">
+                    
+                    <form id="createArtistForm">
+                        <div class="form-group">
+                            <label for="artistName"><i class="fas fa-user"></i> Имя артиста</label>
+                            <input type="text" id="artistName" class="form-control" 
+                                   placeholder="Введите имя артиста" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="artistCountry"><i class="fas fa-globe"></i> Страна</label>
+                            <input type="text" id="artistCountry" class="form-control" 
+                                   placeholder="Введите страну">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="artistActive"><i class="fas fa-bolt"></i> Активен</label>
+                            <select id="artistActive" class="form-control">
+                                <option value="true">Да</option>
+                                <option value="false">Нет</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="artistAlbumCount"><i class="fas fa-compact-disc"></i> Альбомов</label>
+                            <input type="number" id="artistAlbumCount" class="form-control" 
+                                   placeholder="0" min="0">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="artistPopularity"><i class="fas fa-star"></i> Популярность (0-10)</label>
+                            <input type="number" id="artistPopularity" class="form-control" 
+                                   placeholder="0.0" min="0" max="10" step="0.1">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="artistConcerts"><i class="fas fa-calendar-check"></i> ID концертов</label>
+                            <input type="text" id="artistConcerts" class="form-control" 
+                                   placeholder="1, 2, 3">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="artistDebutDate"><i class="fas fa-calendar-plus"></i> Дебют</label>
+                            <input type="date" id="artistDebutDate" class="form-control">
+                        </div>
+                        
+                        <button type="submit" class="btn btn-secondary">
+                            <i class="fas fa-user-plus"></i> Добавить артиста
+                        </button>
+                    </form>
                 </div>
 
-                <div class="form-group">
-                    <label for="concertArtistId">ID артиста:</label>
-                    <input type="number" id="concertArtistId" placeholder="Введите ID артиста">
+                <div id="updateTab" class="tab-content">
+                    <form id="updateConcertForm">
+                        <div class="form-group">
+                            <label for="updateConcertId"><i class="fas fa-music"></i> Выберите концерт</label>
+                            <select id="updateConcertId" class="form-control" required>
+                                <option value="">Выберите концерт...</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="updateConcertTitle">Название</label>
+                            <input type="text" id="updateConcertTitle" class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="updateConcertArtistId">Артист</label>
+                            <select id="updateConcertArtistId" class="form-control">
+                                <option value="">Выберите артиста...</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="updateConcertDate">Дата</label>
+                            <input type="datetime-local" id="updateConcertDate" class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="updateConcertVenue">Место</label>
+                            <input type="text" id="updateConcertVenue" class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="updateConcertPrice">Цена</label>
+                            <input type="number" id="updateConcertPrice" class="form-control" step="0.01">
+                        </div>
+                        
+                        <button type="submit" class="btn">
+                            <i class="fas fa-save"></i> Сохранить изменения
+                        </button>
+                    </form>
+                    
+                    <hr style="margin: 20px 0; border-color: var(--border);">
+                    
+                    <form id="updateArtistForm">
+                        <div class="form-group">
+                            <label for="updateArtistId"><i class="fas fa-user"></i> Выберите артиста</label>
+                            <select id="updateArtistId" class="form-control" required>
+                                <option value="">Выберите артиста...</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="updateArtistName">Имя</label>
+                            <input type="text" id="updateArtistName" class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="updateArtistCountry">Страна</label>
+                            <input type="text" id="updateArtistCountry" class="form-control">
+                        </div>
+                        
+                        <button type="submit" class="btn btn-secondary">
+                            <i class="fas fa-save"></i> Сохранить изменения
+                        </button>
+                    </form>
                 </div>
 
-                <div class="form-group">
-                    <label for="concertVenue">Площадка:</label>
-                    <input type="text" id="concertVenue" placeholder="Введите название площадки">
+                <div id="concertsTab" class="tab-content">
+                    <div style="text-align: center; padding: 20px;">
+                        <i class="fas fa-music" style="font-size: 3rem; color: var(--accent); margin-bottom: 15px;"></i>
+                        <h3 style="margin-bottom: 10px;">Управление концертами</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">
+                            Всего концертов: <span id="concertsCount">0</span><br>
+                            Используйте формы для создания и редактирования
+                        </p>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="concertPrice">Цена билета ($):</label>
-                    <input type="number" id="concertPrice" placeholder="Введите цену" step="0.01">
+                <div id="artistsTab" class="tab-content">
+                    <div style="text-align: center; padding: 20px;">
+                        <i class="fas fa-users" style="font-size: 3rem; color: var(--success); margin-bottom: 15px;"></i>
+                        <h3 style="margin-bottom: 10px;">Управление артистами</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">
+                            Всего артистов: <span id="artistsCount">0</span><br>
+                            Добавляйте новых артистов и управляйте существующими
+                        </p>
+                    </div>
                 </div>
+            </aside>
 
-                <div class="form-group">
-                    <label for="concertSoldOut">Распродан:</label>
-                    <select id="concertSoldOut">
-                        <option value="false">Нет</option>
-                        <option value="true">Да</option>
-                    </select>
-                </div>
+            <main class="main-content">
+                <section class="data-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-calendar-alt"></i> Расписание концертов</h2>
+                        <div class="filter-controls">
+                            <button class="filter-btn active" data-filter="all">Все</button>
+                            <button class="filter-btn" data-filter="upcoming">Предстоящие</button>
+                            <button class="filter-btn" data-filter="past">Прошедшие</button>
+                            <button class="filter-btn" data-filter="soldout">Распроданные</button>
+                        </div>
+                    </div>
+                    
+                    <div id="concertsContainer" class="concerts-grid">
+                        <div class="empty-state">
+                            <i class="fas fa-spinner fa-spin"></i> Загрузка концертов...
+                        </div>
+                    </div>
+                </section>
 
-                <div class="form-group">
-                    <label for="concertGenres">Жанры (через запятую):</label>
-                    <input type="text" id="concertGenres" placeholder="Rock, Pop, Jazz">
-                </div>
+                <section class="data-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-star"></i> Артисты и исполнители</h2>
+                        <div style="color: var(--text-secondary); font-size: 0.9rem;">
+                            Нажмите на карточку для быстрого редактирования
+                        </div>
+                    </div>
+                    
+                    <div id="artistsContainer" class="artists-list">
+                        <div class="empty-state">
+                            <i class="fas fa-spinner fa-spin"></i> Загрузка артистов...
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
 
-                <div class="actions">
-                    <button id="getConcerts">Все концерты (GET)</button>
-                    <button id="getConcert">Концерт по ID (GET)</button>
-                    <button id="createConcert">Создать (POST)</button>
-                    <button id="updateConcert">Обновить (PUT)</button>
-                    <button id="patchConcert">Частично обновить (PATCH)</button>
-                    <button id="deleteConcert">Удалить (DELETE)</button>
-                </div>
-
-                <div id="concertResult" class="result"> <!-- Сюда вывод объектов сделать -->
-
-                </div>
-            </section>
-
-            <section class="section">
-                <h2>Управление артистами</h2>
-                
-                <div class="form-group">
-                    <label for="artistId">Выбрать артиста:</label>
-                    <select id="artistId">
-                        <option value="">Загрузка...</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="artistName">Имя артиста:</label>
-                    <input type="text" id="artistName" placeholder="Введите имя">
-                </div>
-
-                <div class="form-group">
-                    <label for="artistCountry">Страна:</label>
-                    <input type="text" id="artistCountry" placeholder="Введите страну">
-                </div>
-
-                <div class="form-group">
-                    <label for="artistActive">Активен:</label>
-                    <select id="artistActive">
-                        <option value="true">Да</option>
-                        <option value="false">Нет</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="artistAlbumCount">Количество альбомов:</label>
-                    <input type="number" id="artistAlbumCount" placeholder="Введите количество">
-                </div>
-
-                <div class="form-group">
-                    <label for="artistPopularity">Популярность (0-10):</label>
-                    <input type="number" id="artistPopularity" placeholder="0-10" min="0" max="10" step="0.1">
-                </div>
-
-                <div class="form-group">
-                    <label for="artistConcerts">Предстоящие концерты (ID через запятую):</label>
-                    <input type="text" id="artistConcerts" placeholder="1, 2, 3">
-                </div>
-
-                <div class="actions">
-                    <button id="getArtists">Все артисты (GET)</button>
-                    <button id="getArtist">Артист по ID (GET)</button>
-                    <button id="createArtist">Создать (POST)</button>
-                    <button id="updateArtist">Обновить (PUT)</button>
-                    <button id="patchArtist">Частично обновить (PATCH)</button>
-                    <button id="deleteArtist">Удалить (DELETE)</button>
-                </div>
-
-                <div id="artistResult" class="result"> <!-- Сюда вывод объектов сделать -->
-
-                </div>
-            </section>
-        </main>
-
-        <footer>
-            <p>ЛР 9-10 | веб-фреймворк | Node.js HTTP модуль</p>
-            <p>Собственный фреймворк ЧВК</p>
+        <footer style="text-align: center; margin-top: 40px; padding: 20px; color: var(--text-secondary); border-top: 1px solid var(--border);">
+            <p>ConcertFlow • Система управления расписанием концертов</p>
+            <p style="font-size: 0.9rem; margin-top: 5px;">
+                Лабораторная работа 9-10 • Минималистичный веб-фреймворк на Node.js
+            </p>
         </footer>
     </div>
-    <script src="script.js"></script>
+    <script src="/public/script.js"></script>
 </body>
 </html>

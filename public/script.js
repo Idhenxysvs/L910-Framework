@@ -3,11 +3,13 @@ class ConcertManager {
     this.baseUrl = '';
     this.currentView = 'concerts';
     this.concertFilter = 'all';
+    this.currentTheme = 'blue';
     this.init();
   }
 
   async init() {
     this.bindEvents();
+    this.loadTheme();
     await this.loadStats();
     await this.loadConcerts();
     await this.loadArtists();
@@ -22,15 +24,12 @@ class ConcertManager {
         this.switchView(view);
       });
     });
-
     document.querySelectorAll('.control-card').forEach(card => {
       card.addEventListener('click', (e) => {
         const action = e.currentTarget.dataset.action;
         this.handleControlAction(action);
       });
     });
-
-    // Фильтры концертов
     document.querySelectorAll('.filter-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         this.concertFilter = e.target.dataset.filter;
@@ -44,10 +43,47 @@ class ConcertManager {
     document.getElementById('createArtistForm').addEventListener('submit', (e) => this.createArtist(e));
     document.getElementById('editConcertForm').addEventListener('submit', (e) => this.updateConcert(e));
     document.getElementById('editArtistForm').addEventListener('submit', (e) => this.updateArtist(e));
-    
+
     document.querySelectorAll('.btn-cancel').forEach(btn => {
       btn.addEventListener('click', () => this.switchView('concerts'));
     });
+    document.getElementById('themeToggle').addEventListener('click', () => this.toggleTheme());
+  }
+
+  loadTheme() {
+    const savedTheme = localStorage.getItem('concertManagerTheme');
+    if (savedTheme) {
+      this.currentTheme = savedTheme;
+      this.applyTheme();
+    }
+  }
+
+  toggleTheme() {
+    document.body.classList.add('theme-transition');
+    
+    this.currentTheme = this.currentTheme === 'blue' ? 'red' : 'blue';
+    this.applyTheme();
+    localStorage.setItem('concertManagerTheme', this.currentTheme);
+    
+    const themeIcon = document.getElementById('themeIcon');
+    themeIcon.className = this.currentTheme === 'blue' ? 'fas fa-palette' : 'fas fa-fire';
+    
+    this.showNotification(
+      `Тема изменена на ${this.currentTheme === 'blue' ? '🔵 Синюю' : '🔴 Красно-чёрную'}`,
+      'success'
+    );
+    
+    setTimeout(() => {
+      document.body.classList.remove('theme-transition');
+    }, 500);
+  }
+
+  applyTheme() {
+    if (this.currentTheme === 'red') {
+      document.body.classList.add('theme-red');
+    } else {
+      document.body.classList.remove('theme-red');
+    }
   }
 
   async loadStats() {
@@ -108,7 +144,6 @@ class ConcertManager {
 
     container.innerHTML = filteredConcerts.map(concert => this.createConcertCard(concert)).join('');
     
-    // Добавляем обработчики для кнопок действий
     document.querySelectorAll('.edit-concert').forEach(btn => {
       btn.addEventListener('click', (e) => this.prepareEditConcert(e.currentTarget.dataset.id));
     });
@@ -130,12 +165,19 @@ class ConcertManager {
       minute: '2-digit'
     });
     
+    const title = concert.title.length > 50 ? concert.title.substring(0, 47) + '...' : concert.title;
+    const artistName = artist?.name || 'Неизвестный артист';
+    const shortArtistName = artistName.length > 25 ? artistName.substring(0, 22) + '...' : artistName;
+    const venue = concert.venue.length > 25 ? concert.venue.substring(0, 22) + '...' : concert.venue;
+    const genres = concert.genres.join(', ');
+    const shortGenres = genres.length > 25 ? genres.substring(0, 22) + '...' : genres;
+    
     return `
       <div class="concert-card ${isSoldOut ? 'sold-out' : ''}">
         <div class="concert-header">
-          <div>
-            <h3 class="concert-title">${concert.title}</h3>
-            <div class="concert-artist">${artist?.name || 'Неизвестный артист'}</div>
+          <div style="flex: 1; min-width: 0;">
+            <h3 class="concert-title" title="${concert.title}">${title}</h3>
+            <div class="concert-artist" title="${artistName}">${shortArtistName}</div>
           </div>
           <div class="concert-date">${formattedDate}</div>
         </div>
@@ -143,7 +185,7 @@ class ConcertManager {
         <div class="concert-details">
           <div class="detail-item">
             <span class="detail-label">📍 Место:</span>
-            <span class="detail-value">${concert.venue}</span>
+            <span class="detail-value" title="${concert.venue}">${venue}</span>
           </div>
           <div class="detail-item">
             <span class="detail-label">💰 Цена:</span>
@@ -151,10 +193,10 @@ class ConcertManager {
           </div>
           <div class="detail-item">
             <span class="detail-label">🎵 Жанры:</span>
-            <span class="detail-value">${concert.genres.join(', ')}</span>
+            <span class="detail-value" title="${genres}">${shortGenres}</span>
           </div>
           <div class="detail-item">
-            <span class="detail-label">Статус:</span>
+            <span class="detail-label">📅 Статус:</span>
             <span class="detail-value ${isUpcoming ? 'text-success' : 'text-muted'}">
               ${isUpcoming ? 'Предстоящий' : 'Прошедший'}
             </span>
@@ -162,10 +204,10 @@ class ConcertManager {
         </div>
         
         <div class="concert-actions">
-          <button class="action-btn edit-concert" data-id="${concert.id}">
+          <button class="action-btn edit-concert" data-id="${concert.id}" title="Редактировать концерт">
             <i class="fas fa-edit"></i> Редактировать
           </button>
-          <button class="action-btn delete-concert" data-id="${concert.id}">
+          <button class="action-btn delete-concert" data-id="${concert.id}" title="Удалить концерт">
             <i class="fas fa-trash"></i> Удалить
           </button>
         </div>
@@ -204,15 +246,18 @@ class ConcertManager {
       c.artistId === artist.id && new Date(c.date) > new Date()
     ).length || 0;
 
+    const artistName = artist.name.length > 30 ? artist.name.substring(0, 27) + '...' : artist.name;
+    const country = artist.country.length > 20 ? artist.country.substring(0, 17) + '...' : artist.country;
+
     return `
       <div class="artist-card">
         <div class="artist-header">
-          <div class="artist-avatar">
+          <div class="artist-avatar" title="${artist.name}">
             ${artist.name.charAt(0)}
           </div>
           <div class="artist-info">
-            <h3>${artist.name}</h3>
-            <div class="artist-country">${artist.country}</div>
+            <h3 title="${artist.name}">${artistName}</h3>
+            <div class="artist-country" title="${artist.country}">${country}</div>
           </div>
         </div>
         
@@ -235,11 +280,11 @@ class ConcertManager {
           </div>
         </div>
         
-        <div class="concert-actions">
-          <button class="action-btn edit-artist" data-id="${artist.id}">
+        <div class="artist-actions">
+          <button class="action-btn edit-artist" data-id="${artist.id}" title="Редактировать артиста">
             <i class="fas fa-edit"></i> Редактировать
           </button>
-          <button class="action-btn delete-artist" data-id="${artist.id}">
+          <button class="action-btn delete-artist" data-id="${artist.id}" title="Удалить артиста">
             <i class="fas fa-trash"></i> Удалить
           </button>
         </div>
@@ -285,13 +330,13 @@ class ConcertManager {
         body: JSON.stringify(formData)
       });
 
-      this.showNotification('Концерт успешно создан!');
+      this.showNotification('🎉 Концерт успешно создан!');
       document.getElementById('createConcertForm').reset();
       await this.loadConcerts();
       await this.loadStats();
       this.switchView('concerts');
     } catch (error) {
-      this.showNotification('Ошибка создания концерта', 'error');
+      this.showNotification('❌ Ошибка создания концерта', 'error');
     }
   }
 
@@ -317,13 +362,13 @@ class ConcertManager {
         body: JSON.stringify(formData)
       });
 
-      this.showNotification('Артист успешно создан!');
+      this.showNotification('🎉 Артист успешно создан!');
       document.getElementById('createArtistForm').reset();
       await this.loadArtists();
       await this.loadStats();
       this.switchView('artists');
     } catch (error) {
-      this.showNotification('Ошибка создания артиста', 'error');
+      this.showNotification('❌ Ошибка создания артиста', 'error');
     }
   }
 
@@ -332,7 +377,7 @@ class ConcertManager {
     
     const concertId = document.getElementById('editConcertId').value;
     if (!concertId) {
-      this.showNotification('Выберите концерт для редактирования', 'error');
+      this.showNotification('❌ Выберите концерт для редактирования', 'error');
       return;
     }
 
@@ -352,11 +397,11 @@ class ConcertManager {
         body: JSON.stringify(formData)
       });
 
-      this.showNotification('Концерт успешно обновлен!');
+      this.showNotification('✅ Концерт успешно обновлен!');
       await this.loadConcerts();
       this.switchView('concerts');
     } catch (error) {
-      this.showNotification('Ошибка обновления концерта', 'error');
+      this.showNotification('❌ Ошибка обновления концерта', 'error');
     }
   }
 
@@ -365,7 +410,7 @@ class ConcertManager {
     
     const artistId = document.getElementById('editArtistId').value;
     if (!artistId) {
-      this.showNotification('Выберите артиста для редактирования', 'error');
+      this.showNotification('❌ Выберите артиста для редактирования', 'error');
       return;
     }
 
@@ -388,11 +433,11 @@ class ConcertManager {
         body: JSON.stringify(formData)
       });
 
-      this.showNotification('Артист успешно обновлен!');
+      this.showNotification('✅ Артист успешно обновлен!');
       await this.loadArtists();
       this.switchView('artists');
     } catch (error) {
-      this.showNotification('Ошибка обновления артиста', 'error');
+      this.showNotification('❌ Ошибка обновления артиста', 'error');
     }
   }
 
@@ -404,11 +449,11 @@ class ConcertManager {
         method: 'DELETE'
       });
 
-      this.showNotification('Концерт удален!');
+      this.showNotification('🗑️ Концерт удален!');
       await this.loadConcerts();
       await this.loadStats();
     } catch (error) {
-      this.showNotification('Ошибка удаления концерта', 'error');
+      this.showNotification('❌ Ошибка удаления концерта', 'error');
     }
   }
 
@@ -420,11 +465,11 @@ class ConcertManager {
         method: 'DELETE'
       });
 
-      this.showNotification('Артист удален!');
+      this.showNotification('🗑️ Артист удален!');
       await this.loadArtists();
       await this.loadStats();
     } catch (error) {
-      this.showNotification('Ошибка удаления артиста', 'error');
+      this.showNotification('❌ Ошибка удаления артиста', 'error');
     }
   }
 
@@ -442,7 +487,7 @@ class ConcertManager {
     document.getElementById('editConcertGenres').value = concert.genres.join(', ');
 
     this.switchView('editConcert');
-    this.showNotification('Загружены данные концерта для редактирования');
+    this.showNotification('📝 Загружены данные концерта для редактирования');
   }
 
   prepareEditArtist(id) {
@@ -459,7 +504,7 @@ class ConcertManager {
     document.getElementById('editArtistDebutDate').value = artist.debutDate;
 
     this.switchView('editArtist');
-    this.showNotification('Загружены данные артиста для редактирования');
+    this.showNotification('📝 Загружены данные артиста для редактирования');
   }
 
   populateSelects() {
@@ -467,16 +512,17 @@ class ConcertManager {
     if (concertSelect && this.concerts) {
       concertSelect.innerHTML = '<option value="">Выберите концерт...</option>' +
         this.concerts.map(concert => `
-          <option value="${concert.id}">${concert.title} (ID: ${concert.id})</option>
+          <option value="${concert.id}">${concert.title.length > 40 ? concert.title.substring(0, 37) + '...' : concert.title} (ID: ${concert.id})</option>
         `).join('');
     }
-    const artistSelects = ['concertArtistId', 'editConcertArtistId'];
+
+    const artistSelects = ['concertArtistId', 'editConcertArtistId', 'editArtistId'];
     artistSelects.forEach(selectId => {
       const select = document.getElementById(selectId);
       if (select && this.artists) {
         select.innerHTML = '<option value="">Выберите артиста...</option>' +
           this.artists.map(artist => `
-            <option value="${artist.id}">${artist.name}</option>
+            <option value="${artist.id}">${artist.name.length > 40 ? artist.name.substring(0, 37) + '...' : artist.name}</option>
           `).join('');
       }
     });
@@ -484,7 +530,8 @@ class ConcertManager {
 
   switchView(view) {
     this.currentView = view;
-    document.querySelectorAll('.nav-tab').forEach(tab => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+        document.querySelectorAll('.nav-tab').forEach(tab => {
       tab.classList.toggle('active', tab.dataset.view === view);
     });
     document.querySelectorAll('.control-card').forEach(card => {
@@ -507,8 +554,6 @@ class ConcertManager {
     } else if (view === 'editArtist') {
       document.getElementById('editArtistFormSection').classList.add('active');
     }
-    
-    // Обновляем заголовки
     if (view === 'concerts') {
       document.querySelector('#concertsSection h2').innerHTML = '<i class="fas fa-calendar-alt"></i> Расписание концертов';
     } else if (view === 'artists') {
@@ -532,6 +577,7 @@ class ConcertManager {
     document.querySelectorAll('input[type="datetime-local"]').forEach(input => {
       if (!input.value) input.value = `${today}T${time}`;
     });
+    
     document.getElementById('concertPrice').value = '50';
     document.getElementById('concertSoldOut').value = 'false';
     document.getElementById('concertGenres').value = 'Rock, Pop';
@@ -564,17 +610,17 @@ class ConcertManager {
   }
 
   showNotification(message, type = 'success') {
-    // Удаляем старые уведомления
     const oldNotification = document.querySelector('.notification');
     if (oldNotification) oldNotification.remove();
 
-    // Создаем новое уведомление
     const notification = document.createElement('div');
     notification.className = `notification ${type}`;
     notification.textContent = message;
     
     document.body.appendChild(notification);
+    
     setTimeout(() => notification.classList.add('show'), 10);
+    
     setTimeout(() => {
       notification.classList.remove('show');
       setTimeout(() => notification.remove(), 300);

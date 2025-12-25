@@ -42,16 +42,35 @@ app.post('/api/accounts/:id/withdraw', AccountsController.withdraw);
 app.get('/api/accounts/client/:clientId', AccountsController.getByClient);
 
 app.use(async (req, res, next) => {
-    if (req.method === 'GET' && req.path === '/') {
-        res.json({
-            message: 'Банковская система API',
-            note: 'API.',
-            endpoints: {
-                clients: '/api/clients',
-                accounts: '/api/accounts',
-                operations: '/api/accounts/:id/deposit и /api/accounts/:id/withdraw'
+    if (req.method === 'GET' && req.path.startsWith('/public/')) {
+        try {
+            const filePath = path.join(__dirname, '..', req.path);
+            const data = await fs.readFile(filePath);
+            const ext = path.extname(filePath);
+            const mimeTypes = {
+                '.html': 'text/html',
+                '.css': 'text/css',
+                '.js': 'application/javascript',
+                '.json': 'application/json'
+            };
+            res.setHeader('Content-Type', mimeTypes[ext] || 'text/plain');
+            res.end(data);
+        } catch (error) {
+            if (error.code === 'ENOENT') {
+                res.status(404).json({ error: 'File not found' });
+            } else {
+                next(error);
             }
-        });
+        }
+    } else if (req.method === 'GET' && (req.path === '/' || req.path === '/index.html')) {
+        try {
+            const filePath = path.join(__dirname, '../public/index.html');
+            const data = await fs.readFile(filePath);
+            res.setHeader('Content-Type', 'text/html');
+            res.end(data);
+        } catch (error) {
+            next(error);
+        }
     } else {
         next();
     }
@@ -59,10 +78,8 @@ app.use(async (req, res, next) => {
 
 app.useErrorHandler(errorHandler);
 
-const PORT = process.env.PORT || 3002;
+const PORT = process.env.PORT || 3003;
 app.listen(PORT, () => {
-    console.log('='.repeat(50));
-    console.log('БАНКОВСКАЯ СИСТЕМА');
     console.log('='.repeat(50));
     console.log(`Сервер запущен: http://localhost:${PORT}`);
     console.log(`Клиенты API: http://localhost:${PORT}/api/clients`);

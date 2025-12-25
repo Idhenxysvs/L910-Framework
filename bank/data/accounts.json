@@ -1,52 +1,5 @@
 [
   {
-    "id": "A1",
-    "accountNumber": "40702810123456789012",
-    "clientId": "C1",
-    "accountType": "checking",
-    "balance": 125000.50,
-    "currency": "BYN",
-    "openingDate": "2020-01-15T10:00:00.000Z",
-    "isActive": true,
-    "interestRate": 0,
-    "transactions": [
-      {
-        "date": "2024-01-15T10:00:00.000Z",
-        "type": "deposit",
-        "amount": 100000,
-        "description": "Первоначальный взнос",
-        "balanceAfter": 100000
-      },
-      {
-        "date": "2024-02-01T14:30:00.000Z",
-        "type": "deposit",
-        "amount": 25000.50,
-        "description": "Зарплата",
-        "balanceAfter": 125000.50
-      }
-    ]
-  },
-  {
-    "id": "A2",
-    "accountNumber": "40817810234567890123",
-    "clientId": "C1",
-    "accountType": "savings",
-    "balance": 50000,
-    "currency": "BYN",
-    "openingDate": "2021-05-20T11:00:00.000Z",
-    "isActive": true,
-    "interestRate": 5.5,
-    "transactions": [
-      {
-        "date": "2024-01-20T11:00:00.000Z",
-        "type": "deposit",
-        "amount": 50000,
-        "description": "Открытие накопительного счета",
-        "balanceAfter": 50000
-      }
-    ]
-  },
-  {
     "id": "A3",
     "accountNumber": "40702810345678901234",
     "clientId": "C2",
@@ -69,5 +22,25 @@
     "isActive": true,
     "interestRate": 0,
     "transactions": []
+  },
+  {
+    "id": "Amjliceo6",
+    "accountNumber": "407029365698999",
+    "clientId": "Cmjliae95",
+    "accountType": "credit",
+    "balance": 1233889221,
+    "currency": "USD",
+    "openingDate": "2025-12-25T13:57:56.166Z",
+    "isActive": true,
+    "interestRate": 43,
+    "transactions": [
+      {
+        "date": "2025-12-25T13:58:08.482Z",
+        "type": "deposit",
+        "amount": 435678,
+        "description": "354678",
+        "balanceAfter": 1233889221
+      }
+    ]
   }
 ]

@@ -4,7 +4,8 @@
   "description": "Минималистичный веб-фреймворк для Node.js",
   "main": "src/server.js",
   "scripts": {
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
   },
   "keywords": ["framework", "nodejs", "http-server"],
   "author": "",

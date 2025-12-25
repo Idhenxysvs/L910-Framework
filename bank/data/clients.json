@@ -1,23 +1,5 @@
 [
   {
-    "id": "C1",
-    "fullName": "Іваноў Іван Іванавіч",
-    "passport": "BM1234567",
-    "birthDate": "1985-05-15T00:00:00.000Z",
-    "address": "г. Мінск, вул. Кальварыйская, д. 25, кв. 17",
-    "phone": "+375 (29) 123-45-67",
-    "email": "ivanou@example.com",
-    "clientType": "individual",
-    "registrationDate": "2020-01-15T10:00:00.000Z",
-    "isActive": true,
-    "creditRating": 85,
-    "income": 50000,
-    "accountIds": [
-      "A1",
-      "A2"
-    ]
-  },
-  {
     "id": "C2",
     "fullName": "Пятрова Ганна Сяргееўна",
     "passport": "BM7654321",
@@ -50,5 +32,20 @@
     "accountIds": [
       "A4"
     ]
+  },
+  {
+    "id": "Cmjliae95",
+    "fullName": "Никита Сманцер Игоревич",
+    "passport": "456789076",
+    "birthDate": "2025-12-25T13:56:22.313Z",
+    "address": "Белецкого",
+    "phone": "+375 (25) 756-03-65",
+    "email": "n.smantser555@gmail.com",
+    "clientType": "business",
+    "registrationDate": "2025-12-25T13:56:22.313Z",
+    "isActive": true,
+    "creditRating": 0,
+    "income": 35443,
+    "accountIds": []
   }
 ]

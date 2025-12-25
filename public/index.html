@@ -3,71 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Concert Manager</title>
-    <link rel="stylesheet" href="/public/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Расписание концертов - Веб-фреймворк на Node.js</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header class="header">
-        <div class="logo">
-            <i class="fas fa-music"></i>
-            <span>Concert Manager</span>
-        </div>
-        <div class="stats">
-            <div class="stat">
-                <span id="totalConcerts">0</span>
-                <small>Концертов</small>
-            </div>
-            <div class="stat">
-                <span id="totalArtists">0</span>
-                <small>Артистов</small>
-            </div>
-        </div>
-    </header>
+    <div class="container">
+        <header>
+            <h1>Расписание концертов</h1>
+            <p class="subtitle">Веб-фреймворк на NODEJS – ЧВК</p>
+            <p>Вариант 11 | Групповой проект</p>
+        </header>
 
-    <nav class="tabs">
-        <button class="tab active" data-view="concerts">
-            <i class="fas fa-calendar-alt"></i>
-            <span>Концерты</span>
-        </button>
-        <button class="tab" data-view="artists">
-            <i class="fas fa-user"></i>
-            <span>Артисты</span>
-        </button>
-        <button class="tab" data-view="create">
-            <i class="fas fa-plus"></i>
-            <span>Создать</span>
-        </button>
-    </nav>
-
-    <main class="container">
-        <section id="concertsSection" class="section active">
-            <h2><i class="fas fa-calendar-alt"></i> Концерты</h2>
-            <div id="concertsContainer" class="cards-grid">
-            </div>
-        </section>
-
-        <section id="artistsSection" class="section">
-            <h2><i class="fas fa-user"></i> Артисты</h2>
-            <div id="artistsContainer" class="cards-grid">
-            </div>
-        </section>
-
-        <section id="createSection" class="section">
-            <h2><i class="fas fa-plus"></i> Новый концерт</h2>
-            <form id="createForm">
+        <main>
+            <section class="section">
+                <h2>Управление концертами</h2>
+                
                 <div class="form-group">
-                    <label>Название</label>
-                    <input type="text" id="concertTitle" required>
+                    <label for="concertId">Выбрать концерт:</label>
+                    <select id="concertId">
+                        <option value="">Загрузка...</option>
+                    </select>
                 </div>
+
                 <div class="form-group">
-                    <label>Дата</label>
-                    <input type="datetime-local" id="concertDate" required>
+                    <label for="concertTitle">Название концерта:</label>
+                    <input type="text" id="concertTitle" placeholder="Введите название">
                 </div>
-                <button type="submit">Создать</button>
-            </form>
-        </section>
-    </main>
-    <script src="/public/script.js"></script>
+
+                <div class="form-group">
+                    <label for="concertArtistId">ID артиста:</label>
+                    <input type="number" id="concertArtistId" placeholder="Введите ID артиста">
+                </div>
+
+                <div class="form-group">
+                    <label for="concertVenue">Площадка:</label>
+                    <input type="text" id="concertVenue" placeholder="Введите название площадки">
+                </div>
+
+                <div class="form-group">
+                    <label for="concertPrice">Цена билета ($):</label>
+                    <input type="number" id="concertPrice" placeholder="Введите цену" step="0.01">
+                </div>
+
+                <div class="form-group">
+                    <label for="concertSoldOut">Распродан:</label>
+                    <select id="concertSoldOut">
+                        <option value="false">Нет</option>
+                        <option value="true">Да</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="concertGenres">Жанры (через запятую):</label>
+                    <input type="text" id="concertGenres" placeholder="Rock, Pop, Jazz">
+                </div>
+
+                <div class="actions">
+                    <button id="getConcerts">Все концерты (GET)</button>
+                    <button id="getConcert">Концерт по ID (GET)</button>
+                    <button id="createConcert">Создать (POST)</button>
+                    <button id="updateConcert">Обновить (PUT)</button>
+                    <button id="patchConcert">Частично обновить (PATCH)</button>
+                    <button id="deleteConcert">Удалить (DELETE)</button>
+                </div>
+
+                <div id="concertResult" class="result"> <!-- Сюда вывод объектов сделать -->
+
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Управление артистами</h2>
+                
+                <div class="form-group">
+                    <label for="artistId">Выбрать артиста:</label>
+                    <select id="artistId">
+                        <option value="">Загрузка...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="artistName">Имя артиста:</label>
+                    <input type="text" id="artistName" placeholder="Введите имя">
+                </div>
+
+                <div class="form-group">
+                    <label for="artistCountry">Страна:</label>
+                    <input type="text" id="artistCountry" placeholder="Введите страну">
+                </div>
+
+                <div class="form-group">
+                    <label for="artistActive">Активен:</label>
+                    <select id="artistActive">
+                        <option value="true">Да</option>
+                        <option value="false">Нет</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="artistAlbumCount">Количество альбомов:</label>
+                    <input type="number" id="artistAlbumCount" placeholder="Введите количество">
+                </div>
+
+                <div class="form-group">
+                    <label for="artistPopularity">Популярность (0-10):</label>
+                    <input type="number" id="artistPopularity" placeholder="0-10" min="0" max="10" step="0.1">
+                </div>
+
+                <div class="form-group">
+                    <label for="artistConcerts">Предстоящие концерты (ID через запятую):</label>
+                    <input type="text" id="artistConcerts" placeholder="1, 2, 3">
+                </div>
+
+                <div class="actions">
+                    <button id="getArtists">Все артисты (GET)</button>
+                    <button id="getArtist">Артист по ID (GET)</button>
+                    <button id="createArtist">Создать (POST)</button>
+                    <button id="updateArtist">Обновить (PUT)</button>
+                    <button id="patchArtist">Частично обновить (PATCH)</button>
+                    <button id="deleteArtist">Удалить (DELETE)</button>
+                </div>
+
+                <div id="artistResult" class="result"> <!-- Сюда вывод объектов сделать -->
+
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>ЛР 9-10 | веб-фреймворк | Node.js HTTP модуль</p>
+            <p>Собственный фреймворк ЧВК</p>
+        </footer>
+    </div>
+    <script src="script.js"></script>
 </body>
 </html>

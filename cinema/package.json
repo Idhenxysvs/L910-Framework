@@ -1,0 +1,13 @@
+{
+  "name": "cinema",
+  "version": "1.0",
+  "description": "Сервер кинотеатра для проекта по ВебПрог",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

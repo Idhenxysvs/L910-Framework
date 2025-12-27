@@ -1,7 +1,7 @@
 {
-  "name": "shopping_mall_krystall",
+  "name": "shopping_mall",
   "version": "1.0.0",
-  "description": "Хаб торгового центра 'Крышталь' с основными отделами",
+  "description": "Хаб",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

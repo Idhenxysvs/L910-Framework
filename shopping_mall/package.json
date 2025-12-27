@@ -1,11 +1,11 @@
 {
   "name": "shopping_mall",
   "version": "1.0.0",
-  "description": "Торговый центр Крышталь",
+  "description": "Торговый центр 'Крышталь'",
   "main": "start.js",
   "scripts": {
     "start": "node start.js",
-    "hub": "node server/server.js",
+    "hub": "node mall_hub/server.js",
     "concerts": "cd departments/concerts/src && node server.js"
   }
 }

@@ -7,14 +7,8 @@ const AppointmentsController = require('./controllers/appointmentsController');
 const ReviewsController = require('./controllers/reviewsController');
 const path = require('path');
 const fs = require('fs').promises;
-
-// Создаем экземпляр нашего фреймворка
 const app = new GymFramework();
-
-// Middleware
 app.use(bodyParser);
-
-// CORS middleware
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
@@ -27,8 +21,6 @@ app.use((req, res, next) => {
     
     next();
 });
-
-// Маршруты для клиентов (Members)
 app.get('/api/members', MembersController.getAll);
 app.get('/api/members/:id', MembersController.getById);
 app.post('/api/members', MembersController.create);
@@ -37,8 +29,6 @@ app.patch('/api/members/:id', MembersController.patch);
 app.delete('/api/members/:id', MembersController.delete);
 app.get('/api/members/active', MembersController.getActive);
 app.get('/api/members/type/:type', MembersController.getByMembershipType);
-
-// Маршруты для тренеров (Trainers)
 app.get('/api/trainers', TrainersController.getAll);
 app.get('/api/trainers/:id', TrainersController.getById);
 app.post('/api/trainers', TrainersController.create);
@@ -48,8 +38,6 @@ app.delete('/api/trainers/:id', TrainersController.delete);
 app.get('/api/trainers/available', TrainersController.getAvailable);
 app.get('/api/trainers/specialization/:spec', TrainersController.getBySpecialization);
 app.get('/api/trainers/top-rated', TrainersController.getTopRated);
-
-// Маршруты для записей (Appointments)
 app.get('/api/appointments', AppointmentsController.getAll);
 app.get('/api/appointments/:id', AppointmentsController.getById);
 app.post('/api/appointments', AppointmentsController.create);
@@ -60,8 +48,6 @@ app.get('/api/appointments/member/:memberId', AppointmentsController.getByMember
 app.get('/api/appointments/trainer/:trainerId', AppointmentsController.getByTrainer);
 app.get('/api/appointments/date/:date', AppointmentsController.getByDate);
 app.get('/api/appointments/upcoming', AppointmentsController.getUpcoming);
-
-// Маршруты для отзывов (Reviews)
 app.get('/api/reviews', ReviewsController.getAll);
 app.get('/api/reviews/:id', ReviewsController.getById);
 app.post('/api/reviews', ReviewsController.create);
@@ -69,15 +55,11 @@ app.put('/api/reviews/:id', ReviewsController.update);
 app.delete('/api/reviews/:id', ReviewsController.delete);
 app.get('/api/reviews/trainer/:trainerId', ReviewsController.getByTrainer);
 app.get('/api/reviews/member/:memberId', ReviewsController.getByMember);
-
-// Статические файлы
 app.use(async (req, res, next) => {
     if (req.method === 'GET' && req.path.startsWith('/public/')) {
         try {
             const filePath = path.join(__dirname, '..', req.path);
             const data = await fs.readFile(filePath);
-            
-            // Определяем Content-Type
             const ext = path.extname(filePath);
             const mimeTypes = {
                 '.html': 'text/html',
@@ -110,11 +92,7 @@ app.use(async (req, res, next) => {
         next();
     }
 });
-
-// Обработчик ошибок
 app.useErrorHandler(errorHandler);
-
-// Запуск сервера
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`✅ Сервер запущен: http://localhost:${PORT}`);

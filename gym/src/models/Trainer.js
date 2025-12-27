@@ -6,16 +6,16 @@ class Trainer {
     constructor(data = {}) {
         this.id = data.id || this.generateId();
         this.fullName = data.fullName || '';
-        this.specialization = data.specialization || ''; // фитнес, йога, бодибилдинг и т.д.
+        this.specialization = data.specialization || '';
         this.experienceYears = data.experienceYears || 0;
-        this.certifications = data.certifications || []; // массив сертификатов
-        this.workSchedule = data.workSchedule || {}; // объект с расписанием
+        this.certifications = data.certifications || []; 
+        this.workSchedule = data.workSchedule || {}; 
         this.hourlyRate = data.hourlyRate || 0;
         this.isAvailable = data.isAvailable !== undefined ? data.isAvailable : true;
         this.email = data.email || '';
         this.phone = data.phone || '';
         this.clientsCount = data.clientsCount || 0;
-        this.rating = data.rating || 0; // от 0 до 5
+        this.rating = data.rating || 0; 
         this.bio = data.bio || '';
         this.photoUrl = data.photoUrl || '';
     }
@@ -28,14 +28,11 @@ class Trainer {
         return path.join(__dirname, '../../data/trainers.json');
     }
 
-    // Валидация белорусского номера телефона
     static validateBelarusianPhone(phone) {
-        // Форматы: +375 (XX) XXX-XX-XX или +375XXXXXXXXX
         const phoneRegex = /^\+375\s?\(?\d{2}\)?\s?\d{3}[-\s]?\d{2}[-\s]?\d{2}$/;
         return phoneRegex.test(phone);
     }
 
-    // Получить всех тренеров
     static async findAll() {
         try {
             const data = await fs.readFile(this.filePath, 'utf8');
@@ -49,13 +46,11 @@ class Trainer {
         }
     }
 
-    // Найти тренера по ID
     static async findById(id) {
         const trainers = await this.findAll();
         return trainers.find(trainer => trainer.id === id);
     }
 
-    // Создать тренера
     static async create(trainerData) {
         const trainers = await this.findAll();
         const newTrainer = new Trainer(trainerData);
@@ -64,7 +59,6 @@ class Trainer {
         return newTrainer;
     }
 
-    // Обновить тренера
     static async update(id, trainerData) {
         const trainers = await this.findAll();
         const index = trainers.findIndex(t => t.id === id);
@@ -76,7 +70,6 @@ class Trainer {
         return trainers[index];
     }
 
-    // Частичное обновление
     static async patch(id, updates) {
         const trainers = await this.findAll();
         const index = trainers.findIndex(t => t.id === id);
@@ -89,7 +82,6 @@ class Trainer {
         return trainers[index];
     }
 
-    // Удалить тренера
     static async delete(id) {
         const trainers = await this.findAll();
         const filteredTrainers = trainers.filter(trainer => trainer.id !== id);
@@ -100,24 +92,20 @@ class Trainer {
         return true;
     }
 
-    // Сохранить всех тренеров
     static async saveAll(trainers) {
         await fs.writeFile(this.filePath, JSON.stringify(trainers, null, 2));
     }
 
-    // Получить доступных тренеров
     static async findAvailable() {
         const trainers = await this.findAll();
         return trainers.filter(trainer => trainer.isAvailable);
     }
 
-    // Получить тренеров по специализации
     static async findBySpecialization(specialization) {
         const trainers = await this.findAll();
         return trainers.filter(trainer => trainer.specialization === specialization);
     }
 
-    // Получить тренеров с высоким рейтингом
     static async getTopRated(limit = 5) {
         const trainers = await this.findAll();
         return trainers
@@ -125,7 +113,6 @@ class Trainer {
             .slice(0, limit);
     }
 
-    // Обновить рейтинг тренера на основе отзывов
     static async updateRating(trainerId) {
         const reviews = await Review.findByTrainer(trainerId);
         const trainer = await this.findById(trainerId);

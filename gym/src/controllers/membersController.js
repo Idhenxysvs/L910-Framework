@@ -1,7 +1,6 @@
 const Member = require('../models/Member');
 
 class MembersController {
-    // GET /api/members - все клиенты
     static async getAll(req, res) {
         try {
             const members = await Member.findAll();
@@ -11,7 +10,6 @@ class MembersController {
         }
     }
 
-    // GET /api/members/:id - клиент по ID
     static async getById(req, res) {
         try {
             const member = await Member.findById(req.params.id);
@@ -24,17 +22,13 @@ class MembersController {
         }
     }
 
-    // POST /api/members - создать клиента
     static async create(req, res) {
         try {
-            // Валидация
             if (!req.body.fullName || !req.body.email) {
                 return res.status(400).json({ 
                     error: 'Имя и email обязательны' 
                 });
             }
-
-            // Валидация белорусского номера телефона
             if (req.body.phone && !Member.validateBelarusianPhone(req.body.phone)) {
                 return res.status(400).json({ 
                     error: 'Неверный формат белорусского номера телефона. Используйте формат: +375 (XX) XXX-XX-XX' 
@@ -48,10 +42,8 @@ class MembersController {
         }
     }
 
-    // PUT /api/members/:id - обновить клиента
     static async update(req, res) {
         try {
-            // Валидация белорусского номера телефона
             if (req.body.phone && !Member.validateBelarusianPhone(req.body.phone)) {
                 return res.status(400).json({ 
                     error: 'Неверный формат белорусского номера телефона. Используйте формат: +375 (XX) XXX-XX-XX' 
@@ -68,10 +60,8 @@ class MembersController {
         }
     }
 
-    // PATCH /api/members/:id - частично обновить клиента
     static async patch(req, res) {
         try {
-            // Валидация белорусского номера телефона
             if (req.body.phone && !Member.validateBelarusianPhone(req.body.phone)) {
                 return res.status(400).json({ 
                     error: 'Неверный формат белорусского номера телефона. Используйте формат: +375 (XX) XXX-XX-XX' 
@@ -88,7 +78,6 @@ class MembersController {
         }
     }
 
-    // DELETE /api/members/:id - удалить клиента
     static async delete(req, res) {
         try {
             const success = await Member.delete(req.params.id);
@@ -100,8 +89,6 @@ class MembersController {
             res.status(500).json({ error: error.message });
         }
     }
-
-    // GET /api/members/active - активные клиенты
     static async getActive(req, res) {
         try {
             const members = await Member.findActive();
@@ -110,8 +97,6 @@ class MembersController {
             res.status(500).json({ error: error.message });
         }
     }
-
-    // GET /api/members/type/:type - клиенты по типу абонемента
     static async getByMembershipType(req, res) {
         try {
             const members = await Member.findByMembershipType(req.params.type);

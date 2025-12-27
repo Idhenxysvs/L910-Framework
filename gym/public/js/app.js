@@ -1,29 +1,18 @@
 const API_BASE = '/api';
 
-// Управление секциями
 function showSection(sectionId) {
-    // Скрыть все секции
     document.querySelectorAll('.content-section').forEach(section => {
         section.classList.remove('active');
     });
-    
-    // Показать нужную секцию
     document.getElementById(sectionId).classList.add('active');
-    
-    // Обновить активные кнопки
     document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.classList.remove('active');
     });
-    
     const activeBtn = document.querySelector(`.nav-btn[data-section="${sectionId}"]`);
     if (activeBtn) {
         activeBtn.classList.add('active');
     }
-    
-    // Обновить заголовки форм
     updateFormTitles();
-    
-    // Загрузить данные если нужно
     if (sectionId === 'dashboard') {
         loadDashboard();
     } else if (sectionId === 'members') {
@@ -41,24 +30,20 @@ function showSection(sectionId) {
     }
 }
 
-// Обновление заголовков форм
 function updateFormTitles() {
     const memberForm = document.getElementById('member-form');
     const trainerForm = document.getElementById('trainer-form');
     const appointmentForm = document.getElementById('appointment-form');
-    
     if (memberForm.dataset.editId) {
         document.getElementById('member-form-title').textContent = 'Редактирование клиента';
     } else {
         document.getElementById('member-form-title').textContent = 'Новый клиент';
     }
-    
     if (trainerForm.dataset.editId) {
         document.getElementById('trainer-form-title').textContent = 'Редактирование тренера';
     } else {
         document.getElementById('trainer-form-title').textContent = 'Новый тренер';
     }
-    
     if (appointmentForm.dataset.editId) {
         document.getElementById('appointment-form-title').textContent = 'Редактирование записи';
     } else {
@@ -66,7 +51,6 @@ function updateFormTitles() {
     }
 }
 
-// Сброс формы клиента
 function resetMemberForm() {
     const form = document.getElementById('member-form');
     form.reset();
@@ -76,7 +60,6 @@ function resetMemberForm() {
     updateFormTitles();
 }
 
-// Сброс формы тренера
 function resetTrainerForm() {
     const form = document.getElementById('trainer-form');
     form.reset();
@@ -86,7 +69,6 @@ function resetTrainerForm() {
     updateFormTitles();
 }
 
-// Сброс формы записи
 function resetAppointmentForm() {
     const form = document.getElementById('appointment-form');
     form.reset();
@@ -96,11 +78,8 @@ function resetAppointmentForm() {
     updateFormTitles();
 }
 
-// Показать сообщение
 function showMessage(text, type = 'info') {
-    // Удалить старые сообщения
     document.querySelectorAll('.message').forEach(msg => msg.remove());
-    
     const message = document.createElement('div');
     message.className = `message ${type}`;
     message.textContent = text;
@@ -116,39 +95,29 @@ function showMessage(text, type = 'info') {
         box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         animation: slideIn 0.3s ease;
     `;
-    
     document.body.appendChild(message);
-    
     setTimeout(() => {
         message.remove();
     }, 4000);
 }
 
-// Загрузка дашборда
 async function loadDashboard() {
     try {
-        // Загружаем статистику
         const membersResponse = await fetch(`${API_BASE}/members`);
         const members = await membersResponse.json();
         document.getElementById('total-members').textContent = members.length;
-        
         const trainersResponse = await fetch(`${API_BASE}/trainers`);
         const trainers = await trainersResponse.json();
         document.getElementById('total-trainers').textContent = trainers.length;
-        
         const today = new Date().toISOString().split('T')[0];
         const todayAppointmentsResponse = await fetch(`${API_BASE}/appointments/date/${today}`);
         const todayAppointments = await todayAppointmentsResponse.json();
         document.getElementById('today-appointments').textContent = todayAppointments.length;
-        
         const reviewsResponse = await fetch(`${API_BASE}/reviews`);
         const reviews = await reviewsResponse.json();
         document.getElementById('total-reviews').textContent = reviews.length;
-        
-        // Загружаем предстоящие записи
         const upcomingResponse = await fetch(`${API_BASE}/appointments/upcoming`);
         const upcoming = await upcomingResponse.json();
-        
         const upcomingContainer = document.getElementById('upcoming-appointments');
         upcomingContainer.innerHTML = '';
         
@@ -168,11 +137,8 @@ async function loadDashboard() {
                 upcomingContainer.appendChild(item);
             });
         }
-        
-        // Загружаем топ тренеров
         const topTrainersResponse = await fetch(`${API_BASE}/trainers/top-rated?limit=5`);
         const topTrainers = await topTrainersResponse.json();
-        
         const topTrainersContainer = document.getElementById('top-trainers');
         topTrainersContainer.innerHTML = '';
         
@@ -199,7 +165,6 @@ async function loadDashboard() {
     }
 }
 
-// Загрузка клиентов
 async function loadMembers() {
     try {
         const response = await fetch(`${API_BASE}/members`);
@@ -250,7 +215,6 @@ async function loadMembers() {
     }
 }
 
-// Поиск клиентов
 async function searchMembers() {
     const searchTerm = document.getElementById('members-search').value.toLowerCase();
     
@@ -311,7 +275,6 @@ async function searchMembers() {
     }
 }
 
-// Загрузка активных клиентов
 async function showActiveMembers() {
     try {
         const response = await fetch(`${API_BASE}/members/active`);
@@ -355,7 +318,6 @@ async function showActiveMembers() {
     }
 }
 
-// Загрузка тренеров
 async function loadTrainers() {
     try {
         const response = await fetch(`${API_BASE}/trainers`);
@@ -409,7 +371,6 @@ async function loadTrainers() {
     }
 }
 
-// Поиск тренеров
 async function searchTrainers() {
     const searchTerm = document.getElementById('trainers-search').value.toLowerCase();
     
@@ -474,7 +435,6 @@ async function searchTrainers() {
     }
 }
 
-// Загрузка доступных тренеров
 async function showAvailableTrainers() {
     try {
         const response = await fetch(`${API_BASE}/trainers/available`);
@@ -520,7 +480,6 @@ async function showAvailableTrainers() {
     }
 }
 
-// Загрузка записей
 async function loadAppointments() {
     try {
         const response = await fetch(`${API_BASE}/appointments`);
@@ -579,7 +538,6 @@ async function loadAppointments() {
     }
 }
 
-// Фильтрация записей по дате
 async function filterAppointmentsByDate() {
     const date = document.getElementById('appointment-date').value;
     
@@ -645,7 +603,6 @@ async function filterAppointmentsByDate() {
     }
 }
 
-// Показать предстоящие записи
 async function showUpcomingAppointments() {
     try {
         const response = await fetch(`${API_BASE}/appointments/upcoming`);
@@ -704,7 +661,6 @@ async function showUpcomingAppointments() {
     }
 }
 
-// Загрузка отзывов
 async function loadReviews() {
     try {
         const response = await fetch(`${API_BASE}/reviews`);
@@ -748,7 +704,6 @@ async function loadReviews() {
     }
 }
 
-// Фильтрация отзывов по тренеру
 async function filterReviewsByTrainer() {
     const trainerId = document.getElementById('review-trainer-filter').value;
     
@@ -799,7 +754,6 @@ async function filterReviewsByTrainer() {
     }
 }
 
-// Загрузка тренеров для выпадающего списка
 async function loadTrainersForSelect() {
     try {
         const response = await fetch(`${API_BASE}/trainers`);
@@ -822,13 +776,10 @@ async function loadTrainersForSelect() {
     }
 }
 
-// Загрузка клиентов и тренеров для формы записи
 async function loadMembersAndTrainersForSelect() {
     try {
-        // Загрузка клиентов
         const membersResponse = await fetch(`${API_BASE}/members`);
         const members = await membersResponse.json();
-        
         const memberSelect = document.getElementById('appointmentMemberId');
         memberSelect.innerHTML = '<option value="">Выберите клиента</option>';
         
@@ -840,8 +791,7 @@ async function loadMembersAndTrainersForSelect() {
                 memberSelect.appendChild(option);
             }
         });
-        
-        // Загрузка тренеров
+
         const trainersResponse = await fetch(`${API_BASE}/trainers`);
         const trainers = await trainersResponse.json();
         
@@ -856,8 +806,7 @@ async function loadMembersAndTrainersForSelect() {
                 trainerSelect.appendChild(option);
             }
         });
-        
-        // Загрузка тренеров для фильтра отзывов
+
         const reviewTrainerSelect = document.getElementById('review-trainer-filter');
         reviewTrainerSelect.innerHTML = '<option value="">Все тренеры</option>';
         
@@ -873,7 +822,6 @@ async function loadMembersAndTrainersForSelect() {
     }
 }
 
-// Редактирование клиента
 async function editMember(id) {
     try {
         const response = await fetch(`${API_BASE}/members/${id}`);
@@ -883,8 +831,6 @@ async function editMember(id) {
             showMessage('Клиент не найден', 'error');
             return;
         }
-        
-        // Заполняем форму данными
         document.getElementById('fullName').value = member.fullName || '';
         document.getElementById('age').value = member.age || '';
         document.getElementById('email').value = member.email || '';
@@ -893,24 +839,16 @@ async function editMember(id) {
         document.getElementById('height').value = member.height || '';
         document.getElementById('weight').value = member.weight || '';
         document.getElementById('goals').value = member.goals?.join(', ') || '';
-        document.getElementById('isActive').checked = member.isActive !== false;
-        
-        // Загружаем список тренеров
+        document.getElementById('isActive').checked = member.isActive !== false;в
         await loadTrainersForSelect();
         if (member.trainerId) {
             document.getElementById('trainerId').value = member.trainerId;
         }
-        
-        // Меняем текст кнопки и добавляем обработчик
         const form = document.getElementById('member-form');
         const submitBtn = document.getElementById('member-submit-btn');
         submitBtn.innerHTML = '<i class="fas fa-save"></i> Сохранить изменения';
         form.dataset.editId = id;
-        
-        // Обновляем заголовок
         updateFormTitles();
-        
-        // Переходим на форму
         showSection('add-member');
         showMessage('Заполнена форма для редактирования клиента', 'info');
         
@@ -920,7 +858,6 @@ async function editMember(id) {
     }
 }
 
-// Редактирование тренера
 async function editTrainer(id) {
     try {
         const response = await fetch(`${API_BASE}/trainers/${id}`);
@@ -930,8 +867,6 @@ async function editTrainer(id) {
             showMessage('Тренер не найден', 'error');
             return;
         }
-        
-        // Заполняем форму данными
         document.getElementById('trainerFullName').value = trainer.fullName || '';
         document.getElementById('specialization').value = trainer.specialization || 'Фитнес';
         document.getElementById('experienceYears').value = trainer.experienceYears || '';
@@ -941,17 +876,11 @@ async function editTrainer(id) {
         document.getElementById('certifications').value = trainer.certifications?.join(', ') || '';
         document.getElementById('bio').value = trainer.bio || '';
         document.getElementById('isAvailable').checked = trainer.isAvailable !== false;
-        
-        // Меняем текст кнопки
         const form = document.getElementById('trainer-form');
         const submitBtn = document.getElementById('trainer-submit-btn');
         submitBtn.innerHTML = '<i class="fas fa-save"></i> Сохранить изменения';
         form.dataset.editId = id;
-        
-        // Обновляем заголовок
         updateFormTitles();
-        
-        // Переходим на форму
         showSection('add-trainer');
         showMessage('Заполнена форма для редактирования тренера', 'info');
         
@@ -961,7 +890,6 @@ async function editTrainer(id) {
     }
 }
 
-// Редактирование записи
 async function editAppointment(id) {
     try {
         const response = await fetch(`${API_BASE}/appointments/${id}`);
@@ -971,11 +899,7 @@ async function editAppointment(id) {
             showMessage('Запись не найдена', 'error');
             return;
         }
-        
-        // Загружаем списки клиентов и тренеров
         await loadMembersAndTrainersForSelect();
-        
-        // Заполняем форму данными
         document.getElementById('appointmentMemberId').value = appointment.memberId || '';
         document.getElementById('appointmentTrainerId').value = appointment.trainerId || '';
         document.getElementById('appointmentDate').value = appointment.date || '';
@@ -983,17 +907,11 @@ async function editAppointment(id) {
         document.getElementById('appointmentDuration').value = appointment.duration || 60;
         document.getElementById('appointmentStatus').value = appointment.status || 'scheduled';
         document.getElementById('appointmentNotes').value = appointment.notes || '';
-        
-        // Меняем текст кнопки
         const form = document.getElementById('appointment-form');
         const submitBtn = document.getElementById('appointment-submit-btn');
         submitBtn.innerHTML = '<i class="fas fa-save"></i> Сохранить изменения';
         form.dataset.editId = id;
-        
-        // Обновляем заголовок
         updateFormTitles();
-        
-        // Переходим на форму
         showSection('add-appointment');
         showMessage('Заполнена форма для редактирования записи', 'info');
         
@@ -1003,7 +921,6 @@ async function editAppointment(id) {
     }
 }
 
-// Завершение записи
 async function completeAppointment(id) {
     try {
         const response = await fetch(`${API_BASE}/appointments/${id}`, {
@@ -1026,9 +943,7 @@ async function completeAppointment(id) {
     }
 }
 
-// Добавление отзыва
 function addReview(trainerId) {
-    // Создаем модальное окно для добавления отзыва
     const modal = document.createElement('div');
     modal.className = 'modal';
     modal.innerHTML = `
@@ -1067,14 +982,10 @@ function addReview(trainerId) {
             </div>
         </div>
     `;
-    
     document.body.appendChild(modal);
-    
-    // Загружаем список клиентов
     loadMembersForReview();
 }
 
-// Редактирование отзыва
 async function editReview(id) {
     try {
         const response = await fetch(`${API_BASE}/reviews/${id}`);
@@ -1084,8 +995,7 @@ async function editReview(id) {
             showMessage('Отзыв не найден', 'error');
             return;
         }
-        
-        // Создаем модальное окно для редактирования отзыва
+
         const modal = document.createElement('div');
         modal.className = 'modal';
         modal.innerHTML = `
@@ -1126,8 +1036,6 @@ async function editReview(id) {
         `;
         
         document.body.appendChild(modal);
-        
-        // Загружаем список клиентов
         loadMembersForReviewEdit(review.memberId);
         
     } catch (error) {
@@ -1136,7 +1044,6 @@ async function editReview(id) {
     }
 }
 
-// Загрузка клиентов для формы отзыва
 async function loadMembersForReview() {
     try {
         const response = await fetch(`${API_BASE}/members`);
@@ -1157,7 +1064,6 @@ async function loadMembersForReview() {
     }
 }
 
-// Загрузка клиентов для формы редактирования отзыва
 async function loadMembersForReviewEdit(selectedMemberId) {
     try {
         const response = await fetch(`${API_BASE}/members`);
@@ -1181,7 +1087,6 @@ async function loadMembersForReviewEdit(selectedMemberId) {
     }
 }
 
-// Отправка отзыва
 async function submitReview(trainerId) {
     const memberId = document.getElementById('review-member').value;
     const rating = parseInt(document.getElementById('review-rating').value);
@@ -1220,7 +1125,6 @@ async function submitReview(trainerId) {
     }
 }
 
-// Отправка редактированного отзыва
 async function submitReviewEdit(reviewId) {
     const memberId = document.getElementById('review-edit-member').value;
     const rating = parseInt(document.getElementById('review-edit-rating').value);
@@ -1258,7 +1162,6 @@ async function submitReviewEdit(reviewId) {
     }
 }
 
-// Закрытие модального окна
 function closeModal() {
     const modal = document.querySelector('.modal');
     if (modal) {
@@ -1266,7 +1169,6 @@ function closeModal() {
     }
 }
 
-// Добавление/редактирование клиента
 document.getElementById('member-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     
@@ -1321,7 +1223,6 @@ document.getElementById('member-form').addEventListener('submit', async (e) => {
     }
 });
 
-// Добавление/редактирование тренера
 document.getElementById('trainer-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     
@@ -1375,7 +1276,6 @@ document.getElementById('trainer-form').addEventListener('submit', async (e) => 
     }
 });
 
-// Добавление/редактирование записи
 document.getElementById('appointment-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     
@@ -1424,7 +1324,6 @@ document.getElementById('appointment-form').addEventListener('submit', async (e)
     }
 });
 
-// Удаление клиента
 async function deleteMember(id) {
     if (!confirm('Вы уверены, что хотите удалить этого клиента?')) return;
     
@@ -1445,7 +1344,6 @@ async function deleteMember(id) {
     }
 }
 
-// Удаление тренера
 async function deleteTrainer(id) {
     if (!confirm('Вы уверены, что хотите удалить этого тренера?')) return;
     
@@ -1466,7 +1364,6 @@ async function deleteTrainer(id) {
     }
 }
 
-// Удаление записи
 async function deleteAppointment(id) {
     if (!confirm('Вы уверены, что хотите удалить эту запись?')) return;
     
@@ -1487,7 +1384,6 @@ async function deleteAppointment(id) {
     }
 }
 
-// Удаление отзыва
 async function deleteReview(id) {
     if (!confirm('Вы уверены, что хотите удалить этот отзыв?')) return;
     
@@ -1508,9 +1404,7 @@ async function deleteReview(id) {
     }
 }
 
-// Инициализация
 document.addEventListener('DOMContentLoaded', () => {
-    // Добавляем обработчики кнопок навигации
     document.querySelectorAll('.nav-btn').forEach((btn, index) => {
         const sections = ['dashboard', 'members', 'trainers', 'appointments', 'reviews', 'add-member', 'add-trainer', 'add-appointment'];
         if (sections[index]) {
@@ -1520,8 +1414,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     });
-    
-    // Обработчики кнопок отмены
     document.getElementById('cancel-member-btn').addEventListener('click', () => {
         resetMemberForm();
         showSection('members');
@@ -1536,11 +1428,8 @@ document.addEventListener('DOMContentLoaded', () => {
         resetAppointmentForm();
         showSection('appointments');
     });
-    
-    // Устанавливаем сегодняшнюю дату для фильтра записей
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('appointment-date').value = today;
     
-    // Показываем дашборд по умолчанию
     showSection('dashboard');
 });

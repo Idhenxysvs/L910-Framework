@@ -1,7 +1,6 @@
 const Trainer = require('../models/Trainer');
 
 class TrainersController {
-    // GET /api/trainers - все тренеры
     static async getAll(req, res) {
         try {
             const trainers = await Trainer.findAll();
@@ -11,7 +10,6 @@ class TrainersController {
         }
     }
 
-    // GET /api/trainers/:id - тренер по ID
     static async getById(req, res) {
         try {
             const trainer = await Trainer.findById(req.params.id);
@@ -24,7 +22,6 @@ class TrainersController {
         }
     }
 
-    // POST /api/trainers - создать тренера
     static async create(req, res) {
         try {
             if (!req.body.fullName || !req.body.specialization) {
@@ -32,8 +29,6 @@ class TrainersController {
                     error: 'Имя и специализация обязательны' 
                 });
             }
-
-            // Валидация белорусского номера телефона
             if (req.body.phone && !Trainer.validateBelarusianPhone(req.body.phone)) {
                 return res.status(400).json({ 
                     error: 'Неверный формат белорусского номера телефона. Используйте формат: +375 (XX) XXX-XX-XX' 
@@ -47,10 +42,8 @@ class TrainersController {
         }
     }
 
-    // PUT /api/trainers/:id - обновить тренера
     static async update(req, res) {
         try {
-            // Валидация белорусского номера телефона
             if (req.body.phone && !Trainer.validateBelarusianPhone(req.body.phone)) {
                 return res.status(400).json({ 
                     error: 'Неверный формат белорусского номера телефона. Используйте формат: +375 (XX) XXX-XX-XX' 
@@ -67,10 +60,8 @@ class TrainersController {
         }
     }
 
-    // PATCH /api/trainers/:id - частично обновить тренера
     static async patch(req, res) {
         try {
-            // Валидация белорусского номера телефона
             if (req.body.phone && !Trainer.validateBelarusianPhone(req.body.phone)) {
                 return res.status(400).json({ 
                     error: 'Неверный формат белорусского номера телефона. Используйте формат: +375 (XX) XXX-XX-XX' 
@@ -87,7 +78,6 @@ class TrainersController {
         }
     }
 
-    // DELETE /api/trainers/:id - удалить тренера
     static async delete(req, res) {
         try {
             const success = await Trainer.delete(req.params.id);
@@ -100,7 +90,6 @@ class TrainersController {
         }
     }
 
-    // GET /api/trainers/available - доступные тренеры
     static async getAvailable(req, res) {
         try {
             const trainers = await Trainer.findAvailable();
@@ -110,7 +99,6 @@ class TrainersController {
         }
     }
 
-    // GET /api/trainers/specialization/:spec - тренеры по специализации
     static async getBySpecialization(req, res) {
         try {
             const trainers = await Trainer.findBySpecialization(req.params.spec);
@@ -120,7 +108,6 @@ class TrainersController {
         }
     }
 
-    // GET /api/trainers/top-rated - тренеры с высоким рейтингом
     static async getTopRated(req, res) {
         try {
             const limit = parseInt(req.query.limit) || 5;

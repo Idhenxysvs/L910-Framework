@@ -1,4 +1,4 @@
-/* Основные стили */
+
 * {
     margin: 0;
     padding: 0;
@@ -23,7 +23,6 @@ body {
     min-height: 90vh;
 }
 
-/* Шапка */
 header {
     background: linear-gradient(45deg, #2d3748, #4a5568);
     color: white;
@@ -46,7 +45,6 @@ header {
     font-weight: 300;
 }
 
-/* Навигация */
 nav {
     background: #f8f9fa;
     padding: 1rem 2rem;
@@ -83,7 +81,6 @@ nav {
     box-shadow: 0 4px 12px rgba(66, 153, 225, 0.4);
 }
 
-/* Основной контент */
 main {
     padding: 2rem;
 }
@@ -172,7 +169,6 @@ main {
     opacity: 0.9;
 }
 
-/* Дашборд */
 .dashboard-cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -289,7 +285,6 @@ main {
     font-weight: 600;
 }
 
-/* Карточки */
 .cards-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -471,7 +466,6 @@ main {
     background: #805ad5;
 }
 
-/* Формы */
 .form-container {
     max-width: 900px;
     margin: 0 auto;
@@ -555,7 +549,6 @@ main {
     margin-top: 2rem;
 }
 
-/* Подвал */
 footer {
     background: #2d3748;
     color: white;
@@ -569,13 +562,11 @@ footer {
     margin-top: 5px;
 }
 
-/* Анимации */
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Сообщения */
 .message {
     position: fixed;
     top: 20px;
@@ -613,7 +604,6 @@ footer {
     }
 }
 
-/* Модальное окно */
 .modal {
     position: fixed;
     top: 0;
@@ -674,7 +664,6 @@ footer {
     gap: 10px;
 }
 
-/* Адаптивность */
 @media (max-width: 768px) {
     .form-row {
         flex-direction: column;
@@ -726,4 +715,30 @@ footer {
     color: #718096;
     font-style: italic;
     grid-column: 1 / -1;
+}
+
+.btn-home {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 10px 20px;
+    background: #48bb78;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.btn-home:hover {
+    background: #38a169;
+    transform: translateY(-2px);
+}
+
+header {
+    position: relative;
 }

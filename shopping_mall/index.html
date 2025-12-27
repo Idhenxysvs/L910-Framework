@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Торговый центр "Крышталь"</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">ТЦ "Крышталь"</div>
+                <nav>
+                    <ul>
+                        <li><a href="#home">Главная</a></li>
+                        <li><a href="#services">Услуги</a></li>
+                        <li><a href="#info">Информация</a></li>
+                        <li><a href="#contacts">Контакты</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero" id="home">
+        <div class="container">
+            <h1>Добро пожаловать в торговый центр "Крышталь"</h1>
+            <p>Современный торговый комплекс широкого выбора услуг: от шопинга и билетов до фитнеса и банковских услуг. Идеальное место для отдыха.</p>
+            <a href="#services" class="btn-hero">Наши услуги</a>
+        </div>
+    </section>
+
+    <section class="services" id="services">
+        <div class="container">
+            <h2 class="section-title">Основные отделы ТЦ</h2>
+            <div class="services-grid">
+                <div class="service-card" data-service="cinema">
+                    <div class="service-icon">
+                        <i class="fas fa-film"></i>
+                    </div>
+                    <div class="service-content">
+                        <h3>Кинотеатр</h3>
+                        <p>Новейшие фильмы в комфортных залах. Сеансы каждый день с 10:00 до 00:00.</p>
+                        <a class="service-btn" data-service="cinema">Подробнее</a>
+                    </div>
+                </div>
+
+                <div class="service-card" data-service="gym">
+                    <div class="service-icon">
+                        <i class="fas fa-dumbbell"></i>
+                    </div>
+                    <div class="service-content">
+                        <h3>Спортзал</h3>
+                        <p>Современное оборудование, групповые занятия, персональные тренировки. Открыто с 7:00 до 23:00.</p>
+                        <a class="service-btn" data-service="gym">Подробнее</a>
+                    </div>
+                </div>
+
+                <div class="service-card" data-service="concerts">
+                    <div class="service-icon">
+                        <i class="fas fa-music"></i>
+                    </div>
+                    <div class="service-content">
+                        <h3>Концерты</h3>
+                        <p>Расписание концертов и мероприятий. Просмотр мероприятий и артистов.</p>
+                        <a class="service-btn" data-service="concerts">Подробнее</a>
+                    </div>
+                </div>
+
+                <div class="service-card" data-service="bank">
+                    <div class="service-icon">
+                        <i class="fas fa-university"></i>
+                    </div>
+                    <div class="service-content">
+                        <h3>Банк</h3>
+                        <p>Полный спектр банковских услуг: кредиты, вклады, платежи. Работаем с 9:00 до 20:00 без выходных.</p>
+                        <a class="service-btn" data-service="bank">Подробнее</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="info" id="info">
+        <div class="container">
+            <div class="info-grid">
+                <div class="info-card">
+                    <i class="fas fa-clock"></i>
+                    <h3>Часы работы</h3>
+                    <p>Пн-Вс: 9:00 - 22:00</p>
+                </div>
+                <div class="info-card">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <h3>Адрес</h3>
+                    <p>г. Москва, ул. Торговая, 15</p>
+                </div>
+                <div class="info-card">
+                    <i class="fas fa-phone"></i>
+                    <h3>Телефон</h3>
+                    <p>+7 (495) 123-45-67</p>
+                </div>
+                <div class="info-card">
+                    <i class="fas fa-car"></i>
+                    <h3>Парковка</h3>
+                    <p>Бесплатная на 1500 мест</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer id="contacts">
+        <div class="container">
+            <div class="footer-content">
+                <div class="logo">ТЦ "Крышталь"</div>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-vk"></i></a>
+                    <a href="#"><i class="fab fa-telegram"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+                <div class="copyright">
+                    <p>&copy; 2023 Торговый центр "Крышталь". Все права защищены.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div class="modal" id="serviceModal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 id="modalTitle">Кинотеатр</h2>
+            <p id="modalDescription">Подробная информация о выбранной услуге.</p>
+            <div class="port-info">
+                Переход на порт: <span id="modalPort">3000</span>
+            </div>
+            <button id="testRedirect" class="service-btn">Тестовый переход</button>
+            <p style="margin-top: 1rem; font-size: 0.9rem; color: #888;">!!!Добавить переходы</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

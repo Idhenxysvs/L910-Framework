@@ -78,7 +78,7 @@ app.use(async (req, res, next) => {
 
 app.useErrorHandler(errorHandler);
 
-const PORT = process.env.PORT || 3003;
+const PORT = process.env.PORT || 3004;
 app.listen(PORT, () => {
     console.log('='.repeat(50));
     console.log(`Сервер запущен: http://localhost:${PORT}`);

@@ -13,6 +13,9 @@ class Account {
         this.isActive = data.isActive !== undefined ? data.isActive : true;
         this.interestRate = data.interestRate || 0;
         this.transactions = data.transactions || [];
+        this.lastPatched = data.lastPatched || new Date().toISOString();
+        this.patchSequence = data.patchSequence || 0;
+        this.interestRateHistory = data.interestRateHistory || [];
     }
 
     static get filePath() {
@@ -60,14 +63,34 @@ class Account {
     }
 
     static async patch(id, updates) {
-        const accounts = await this.findAll();
-        const index = accounts.findIndex(a => a.id === id);
-        if (index === -1) return null;
-        const updatedAccount = { ...accounts[index], ...updates, id };
-        accounts[index] = new Account(updatedAccount);
-        await this.saveAll(accounts);
-        return accounts[index];
+    const accounts = await this.findAll();
+    const index = accounts.findIndex(a => a.id === id);
+    if (index === -1) return null;
+    
+    const now = new Date().toISOString();
+    const actualUpdates = { ...updates };
+    actualUpdates.lastPatched = now;
+    actualUpdates.patchSequence = (accounts[index].patchSequence || 0) + 1;
+    if (updates.interestRate !== undefined) {
+        const rateHistory = accounts[index].interestRateHistory || [];
+        rateHistory.push({
+            timestamp: now,
+            oldRate: accounts[index].interestRate,
+            newRate: updates.interestRate
+        });
+        actualUpdates.interestRateHistory = rateHistory.slice(-5);
     }
+    
+    const updatedAccount = { 
+        ...accounts[index], 
+        ...actualUpdates, 
+        id
+    };
+    
+    accounts[index] = new Account(updatedAccount);
+    await this.saveAll(accounts);
+    return accounts[index];
+}
 
     static async delete(id) {
         const accounts = await this.findAll();

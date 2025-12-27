@@ -16,6 +16,9 @@ class Client {
         this.creditRating = data.creditRating || 0;
         this.income = data.income || 0;
         this.accountIds = data.accountIds || [];
+        this.lastModified = data.lastModified || new Date().toISOString();
+        this.modificationCount = data.modificationCount || 0;
+        this.patchHistory = data.patchHistory || [];
     }
 
     static get filePath() {
@@ -58,14 +61,25 @@ class Client {
     }
 
     static async patch(id, updates) {
-        const clients = await this.findAll();
-        const index = clients.findIndex(c => c.id === id);
-        if (index === -1) return null;
-        const updatedClient = { ...clients[index], ...updates, id };
-        clients[index] = new Client(updatedClient);
-        await this.saveAll(clients);
-        return clients[index];
-    }
+    const clients = await this.findAll();
+    const index = clients.findIndex(c => c.id === id);
+    if (index === -1) return null;
+    
+    const now = new Date().toISOString();
+    const actualUpdates = { ...updates };
+    actualUpdates.lastModified = now;
+    actualUpdates.modificationCount = (clients[index].modificationCount || 0) + 1;
+    
+    const updatedClient = { 
+        ...clients[index], 
+        ...actualUpdates, 
+        id
+    };
+    
+    clients[index] = new Client(updatedClient);
+    await this.saveAll(clients);
+    return clients[index];
+}
 
     static async delete(id) {
         const clients = await this.findAll();

@@ -1,22 +1,5 @@
 [
   {
-    "id": "C2",
-    "fullName": "Пятрова Ганна Сяргееўна",
-    "passport": "BM7654321",
-    "birthDate": "1990-08-22T00:00:00.000Z",
-    "address": "г. Гродна, вул. Савецкая, д. 12, кв. 8",
-    "phone": "+375 (29) 987-65-43",
-    "email": "patrova@example.com",
-    "clientType": "vip",
-    "registrationDate": "2021-03-10T14:30:00.000Z",
-    "isActive": true,
-    "creditRating": 95,
-    "income": 150000,
-    "accountIds": [
-      "A3"
-    ]
-  },
-  {
     "id": "C3",
     "fullName": "ТАА 'Рамонак'",
     "passport": "",
@@ -31,7 +14,10 @@
     "income": 500000,
     "accountIds": [
       "A4"
-    ]
+    ],
+    "lastModified": "2025-12-27T14:29:19.962Z",
+    "modificationCount": 0,
+    "patchHistory": []
   },
   {
     "id": "Cmjliae95",
@@ -46,6 +32,27 @@
     "isActive": true,
     "creditRating": 0,
     "income": 35443,
-    "accountIds": []
-  }
+    "accountIds": [],
+    "lastModified": "2025-12-27T14:29:19.962Z",
+    "modificationCount": 0,
+    "patchHistory": []
+  },
+  {
+    "id": "C2",
+    "fullName": "Пятрова Ганна Сяргееўна",
+    "passport": "BM7654321",
+    "birthDate": "1990-08-22T00:00:00.000Z",
+    "address": "г. Гродна, вул. Савецкая, д. 12, кв. 8",
+    "phone": "+375 (29) 987-65-43",
+    "email": "patrova@example.com",
+    "clientType": "vip",
+    "registrationDate": "2021-03-10T14:30:00.000Z",
+    "isActive": true,
+    "creditRating": 95,
+    "income": 150000,
+    "accountIds": ["A3"],
+    "lastModified": "2025-12-27T14:29:19.962Z",
+    "modificationCount": 0,
+    "patchHistory": []
+}
 ]

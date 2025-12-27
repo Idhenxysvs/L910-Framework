@@ -1,5 +1,6 @@
 const http = require('http');
 const url = require('url');
+const fs = require('fs').promises;
 const { EventEmitter } = require('events');
 
 class Request {
@@ -211,38 +212,177 @@ class App extends EventEmitter {
     }
 }
 
+const readJSON = async (filename) => {
+    try {
+        const data = await fs.readFile(`./data/${filename}`, 'utf8');
+        return JSON.parse(data);
+    } catch (err) {
+        console.log(`Файл ${filename} не найден, создаем пустой массив`);
+        return [];
+    }
+};
+
+const writeJSON = async (filename, data) => {
+    await fs.writeFile(`./data/${filename}`, JSON.stringify(data, null, 2));
+};
+
 const app = new App();
 
 app.use(async (req, res) => {
     console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
 });
 
+
+app.get('/api/films', async (req, res) => {
+    try {
+        const films = await readJSON('films.json');
+        res.json(films);
+    } catch (error) {
+        console.error('Ошибка при чтении фильмов:', error);
+        res.status(500).json({ error: 'Ошибка сервера при чтении фильмов' });
+    }
+});
+
+app.get('/api/films/:id', async (req, res) => {
+    try {
+        const films = await readJSON('films.json');
+        const film = films.find(f => f.id == req.params.id);
+        
+        if (film) {
+            res.json(film);
+        } else {
+            res.status(404).json({ error: 'Фильм не найден' });
+        }
+    } catch (error) {
+        console.error('Ошибка при чтении фильма:', error);
+        res.status(500).json({ error: 'Ошибка сервера при чтении фильма' });
+    }
+});
+
+app.post('/api/films', async (req, res) => {
+    try {
+        const body = await req.body();
+        const films = await readJSON('films.json');
+        
+        if (!body.title) {
+            return res.status(400).json({ error: 'Название фильма обязательно' });
+        }
+        
+        const newFilm = {
+            id: Date.now(),
+            title: body.title,
+            director: body.director || 'Неизвестный режиссер',
+            year: body.year || new Date().getFullYear(),
+            duration: body.duration || 120,
+            isReleased: body.isReleased !== undefined ? body.isReleased : true,
+            genres: body.genres || ['Драма'],
+            releaseDate: body.releaseDate || new Date().toISOString().split('T')[0]
+        };
+        
+        films.push(newFilm);
+        await writeJSON('films.json', films);
+        
+        res.status(201).json(newFilm);
+    } catch (error) {
+        console.error('Ошибка при создании фильма:', error);
+        res.status(500).json({ error: 'Ошибка сервера при создании фильма' });
+    }
+});
+
+app.put('/api/films/:id', async (req, res) => {
+    try {
+        const body = await req.body();
+        let films = await readJSON('films.json');
+        const index = films.findIndex(f => f.id == req.params.id);
+        
+        if (index === -1) {
+            return res.status(404).json({ error: 'Фильм не найден' });
+        }
+        
+        films[index] = { 
+            ...body, 
+            id: films[index].id
+        };
+        
+        await writeJSON('films.json', films);
+        res.json(films[index]);
+    } catch (error) {
+        console.error('Ошибка при обновлении фильма:', error);
+        res.status(500).json({ error: 'Ошибка сервера при обновлении фильма' });
+    }
+});
+
+app.patch('/api/films/:id', async (req, res) => {
+    try {
+        const body = await req.body();
+        let films = await readJSON('films.json');
+        const index = films.findIndex(f => f.id == req.params.id);
+        
+        if (index === -1) {
+            return res.status(404).json({ error: 'Фильм не найден' });
+        }
+        
+        const randomField = `patch_${Date.now()}`;
+        films[index] = { 
+            ...films[index], 
+            ...body,
+            [randomField]: Math.random()
+        };
+        
+        await writeJSON('films.json', films);
+        res.json(films[index]);
+    } catch (error) {
+        console.error('Ошибка при частичном обновлении фильма:', error);
+        res.status(500).json({ error: 'Ошибка сервера при обновлении фильма' });
+    }
+});
+
+app.delete('/api/films/:id', async (req, res) => {
+    try {
+        let films = await readJSON('films.json');
+        const initialLength = films.length;
+        
+        films = films.filter(f => f.id != req.params.id);
+        
+        if (films.length === initialLength) {
+            return res.status(404).json({ error: 'Фильм не найден' });
+        }
+        
+        await writeJSON('films.json', films);
+        res.status(204).send();
+    } catch (error) {
+        console.error('Ошибка при удалении фильма:', error);
+        res.status(500).json({ error: 'Ошибка сервера при удалении фильма' });
+    }
+});
+
 app.get('/', (req, res) => {
     res.json({ 
-        message: 'Фреймворк работает!', 
-        version: '1.0.0',
-        availableMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
+        message: 'API кинотеатра', 
+        version: '2.0',
+        availableEndpoints: {
+            films: {
+                'GET /api/films': 'Получить все фильмы',
+                'GET /api/films/:id': 'Получить фильм по ID',
+                'POST /api/films': 'Создать новый фильм',
+                'PUT /api/films/:id': 'Полностью обновить фильм',
+                'PATCH /api/films/:id': 'Частично обновить фильм',
+                'DELETE /api/films/:id': 'Удалить фильм'
+            }
+        }
     });
 });
 
-app.get('/api/test', (req, res) => {
-    res.json({ test: 'ok', query: req.query });
-});
-
-app.post('/api/test', async (req, res) => {
-    const body = await req.body();
-    res.status(201).json({ 
-        message: 'POST запрос получен',
-        body: body 
-    });
-});
-
-// Запуск сервера
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Фреймворк запущен на http://localhost:${PORT}`);
-    console.log('Доступные методы:');
-    console.log('  GET  /         - информация о фреймворке');
-    console.log('  GET  /api/test - тестовый GET с query-параметрами');
-    console.log('  POST /api/test - тестовый POST с body');
+    console.log(`🎬 API кинотеатра запущен на порту ${PORT}`);
+    console.log(`📁 Данные хранятся в папке /data/`);
+    console.log('\nДоступные маршруты:');
+    console.log('  GET  /              - информация о API');
+    console.log('  GET  /api/films     - получить все фильмы');
+    console.log('  GET  /api/films/:id - получить фильм по ID');
+    console.log('  POST /api/films     - создать новый фильм');
+    console.log('  PUT  /api/films/:id - полностью обновить фильм');
+    console.log('  PATCH /api/films/:id - частично обновить фильм');
+    console.log('  DELETE /api/films/:id - удалить фильм');
 });

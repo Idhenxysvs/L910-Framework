@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "title": "The Matrix",
+    "director": "The Wachowskis",
+    "year": 1999,
+    "duration": 136,
+    "isReleased": true,
+    "genres": [
+      "Action",
+      "Sci-Fi"
+    ],
+    "releaseDate": "1999-03-31"
+  },
+  {
+    "id": 1766775513301,
+    "title": "Зелёный слоник",
+    "director": "Антон Чигур",
+    "year": 2001,
+    "duration": 52,
+    "isReleased": true,
+    "genres": [
+      "Драмма",
+      "боевик"
+    ],
+    "releaseDate": "2001-09-11",
+    "patched": true,
+    "patchTimestamp": "2025-12-26T18:59:02.959Z",
+    "patchNote": "Патч применен 26.12.2025, 21:59:02",
+    "patch_1766775542964": 0.8321135746583859
+  }
+]

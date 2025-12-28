@@ -29,3 +29,19 @@
 &nbsp;&nbsp;"createdAt": "2025-12-22T12:00:00.000Z", — дата и время создания концерта  
 &nbsp;&nbsp;"updatedAt": "2025-12-25T18:34:20.640Z", — дата и время обновления данных концерта  
 }  
+
+## API Документация:
+
+GET    /concerts 		— список всех концертов;
+GET    /concerts/:id 	— концерт по ID;
+POST   /concerts 		— создать новый концерт;
+PUT    /concerts/:id 	— обновить концерт;
+PATCH  /concerts/:id 	— частично обновить концерт;
+DELETE /concerts/:id 	— удалить концерт.
+
+GET    /artists 		— список всех артистов;
+GET    /artists/:id 	— артист по ID;
+POST   /artists 		— создать нового артиста;
+PUT    /artists/:id 	— обновить артиста;
+PATCH  /artists/:id 	— частично обновить артиста;
+DELETE /artists/:id 	— удалить артиста.

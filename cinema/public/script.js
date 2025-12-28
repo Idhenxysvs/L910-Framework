@@ -19,11 +19,26 @@ class CinemaAPI {
         try {
             const response = await fetch(`${this.baseUrl}${endpoint}`, options);
             
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+            // Проверяем, является ли ответ JSON
+            const contentType = response.headers.get('content-type');
+            let result;
+            
+            // Обработка 204 No Content (успешное удаление)
+            if (response.status === 204) {
+                return null;
             }
             
-            return await response.json();
+            if (contentType && contentType.includes('application/json')) {
+                result = await response.json();
+            } else {
+                result = await response.text();
+            }
+            
+            if (!response.ok) {
+                throw new Error(typeof result === 'object' && result.error ? result.error : `HTTP error! status: ${response.status}`);
+            }
+            
+            return result;
         } catch (error) {
             console.error('API Request error:', error);
             throw error;
@@ -79,16 +94,79 @@ class CinemaAPI {
     async deleteSession(id) {
         return this.request(`/api/sessions/${id}`, 'DELETE');
     }
+
+    // Проверка доступности сервера
+    async checkHealth() {
+        try {
+            const response = await fetch('/api/films');
+            return response.ok;
+        } catch {
+            return false;
+        }
+    }
 }
 
 // Глобальные переменные
-const api = new CinemaAPI();
-let filmsData = [];
-let sessionsData = [];
 let currentFilmId = null;
 let currentSessionId = null;
+let filmsData = [];
+let sessionsData = [];
 
-// Функции для работы с интерфейсом
+// Создаем экземпляр API
+const api = new CinemaAPI();
+
+// Вспомогательные функции
+function showNotification(message, type = 'info') {
+    const notifications = document.getElementById('notifications');
+    if (!notifications) return;
+    
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    
+    const icons = {
+        success: 'fa-check-circle',
+        error: 'fa-exclamation-circle',
+        warning: 'fa-exclamation-triangle',
+        info: 'fa-info-circle'
+    };
+    
+    notification.innerHTML = `
+        <i class="fas ${icons[type] || icons.info}"></i>
+        <div class="notification-content">
+            <h4>${type === 'success' ? 'Успешно!' : type === 'error' ? 'Ошибка!' : type === 'warning' ? 'Внимание!' : 'Информация'}</h4>
+            <p>${message}</p>
+        </div>
+        <button class="notification-close">&times;</button>
+    `;
+    
+    notifications.appendChild(notification);
+    
+    // Добавляем обработчик для кнопки закрытия
+    notification.querySelector('.notification-close').addEventListener('click', () => {
+        notification.remove();
+    });
+    
+    // Автоудаление через 5 секунд
+    setTimeout(() => {
+        if (notification.parentElement) {
+            notification.remove();
+        }
+    }, 5000);
+}
+
+function formatDate(dateString) {
+    if (!dateString) return 'Не указана';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('ru-RU', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
+// Функция для переключения вкладок (новый функционал)
 function showTab(tabName) {
     // Скрыть все вкладки
     document.querySelectorAll('.tab-content').forEach(tab => {
@@ -96,349 +174,131 @@ function showTab(tabName) {
     });
     
     // Показать выбранную вкладку
-    document.getElementById(`${tabName}-tab`).classList.add('active');
+    const tabElement = document.getElementById(`${tabName}-tab`);
+    if (tabElement) {
+        tabElement.classList.add('active');
+    }
     
     // Обновить активные кнопки вкладок
     document.querySelectorAll('.tab').forEach(tab => {
         tab.classList.remove('active');
     });
     
-    event.target.classList.add('active');
+    // Найти и активировать соответствующую кнопку
+    const activeTabButton = Array.from(document.querySelectorAll('.tab')).find(tab => 
+        tab.getAttribute('onclick')?.includes(`'${tabName}'`)
+    );
+    if (activeTabButton) {
+        activeTabButton.classList.add('active');
+    }
+    
+    // Загрузить данные для выбранной вкладки
+    if (tabName === 'films') {
+        getFilms();
+    } else if (tabName === 'sessions') {
+        getSessions();
+    }
 }
 
-function showFilmForm() {
-    document.getElementById('film-modal').classList.add('active');
-    document.getElementById('film-modal-title').textContent = 'Добавить фильм';
-    document.getElementById('filmForm').reset();
-    currentFilmId = null;
+function toggleMobileMenu() {
+    const mobileMenu = document.getElementById('mobileMenu');
+    if (mobileMenu) {
+        mobileMenu.classList.toggle('active');
+    }
 }
 
-function closeFilmForm() {
-    document.getElementById('film-modal').classList.remove('active');
-}
-
-function showSessionForm() {
-    document.getElementById('session-modal').classList.add('active');
-    document.getElementById('session-modal-title').textContent = 'Добавить сеанс';
-    document.getElementById('sessionForm').reset();
-    currentSessionId = null;
-}
-
-function closeSessionForm() {
-    document.getElementById('session-modal').classList.remove('active');
+// Функция для кнопки "Назад"
+function goBack() {
+    window.history.back();
 }
 
 // Функции для работы с фильмами
-async function loadFilms() {
+async function getFilms() {
+    const loading = document.getElementById('films-loading');
+    const empty = document.getElementById('films-empty');
     const container = document.getElementById('films-container');
-    container.innerHTML = `
-        <div class="loading">
-            <div class="spinner"></div>
-            <p>Загрузка фильмов...</p>
-        </div>
-    `;
-
+    
+    if (loading) loading.style.display = 'flex';
+    if (container) container.innerHTML = '';
+    
     try {
         filmsData = await api.getFilms();
         
-        if (filmsData.length === 0) {
-            container.innerHTML = `
-                <div class="empty-state">
-                    <i class="fas fa-film fa-3x"></i>
-                    <h3>Нет фильмов</h3>
-                    <p>Добавьте первый фильм, нажав кнопку "Добавить фильм"</p>
-                </div>
-            `;
+        if (!filmsData || filmsData.length === 0) {
+            if (loading) loading.style.display = 'none';
+            if (empty) empty.style.display = 'block';
+            updateCounters();
             return;
         }
-
-        container.innerHTML = `
-            <div class="films-grid" id="films-grid"></div>
-        `;
-
-        const grid = document.getElementById('films-grid');
-        filmsData.forEach(film => {
-            const filmCard = document.createElement('div');
-            filmCard.className = 'film-card';
-            filmCard.innerHTML = `
-                <div class="film-header">
-                    <h3>${film.title || 'Без названия'}</h3>
-                    <div class="film-year">${film.year || 'Не указан'}</div>
-                </div>
-                <div class="film-body">
-                    <div class="film-info">
-                        <div class="film-info-item">
-                            <i class="fas fa-user-tie"></i>
-                            <span>Режиссер: ${film.director || 'Не указан'}</span>
-                        </div>
-                        <div class="film-info-item">
-                            <i class="fas fa-clock"></i>
-                            <span>Длительность: ${film.duration || 0} мин</span>
-                        </div>
-                        <div class="film-info-item">
-                            <i class="fas fa-calendar"></i>
-                            <span>Дата выпуска: ${film.releaseDate || 'Не указана'}</span>
-                        </div>
-                        <div class="film-info-item">
-                            <i class="fas fa-check-circle"></i>
-                            <span>Статус: ${film.isReleased ? 'Выпущен' : 'Скоро'}</span>
-                        </div>
-                    </div>
-                    
-                    <div class="film-genres">
-                        ${(film.genres || []).map(genre => `
-                            <span class="genre-tag">${genre}</span>
-                        `).join('')}
-                    </div>
-                    
-                    <div class="film-actions">
-                        <button class="btn btn-primary" onclick="editFilm(${film.id})">
-                            <i class="fas fa-edit"></i> Изменить
-                        </button>
-                        <button class="btn btn-danger" onclick="deleteFilm(${film.id})">
-                            <i class="fas fa-trash"></i> Удалить
-                        </button>
-                        <button class="btn btn-warning" onclick="patchFilm(${film.id})">
-                            <i class="fas fa-magic"></i> PATCH
-                        </button>
-                    </div>
-                </div>
-            `;
-            grid.appendChild(filmCard);
-        });
-    } catch (error) {
-        container.innerHTML = `
-            <div class="empty-state">
-                <i class="fas fa-exclamation-triangle fa-3x"></i>
-                <h3>Ошибка загрузки</h3>
-                <p>${error.message}</p>
-            </div>
-        `;
-    }
-}
-
-async function editFilm(id) {
-    try {
-        const film = await api.getFilm(id);
-        currentFilmId = id;
         
-        document.getElementById('filmId').value = film.id;
-        document.getElementById('filmTitle').value = film.title || '';
-        document.getElementById('filmDirector').value = film.director || '';
-        document.getElementById('filmYear').value = film.year || '';
-        document.getElementById('filmDuration').value = film.duration || '';
-        document.getElementById('filmGenres').value = (film.genres || []).join(', ');
-        document.getElementById('filmReleaseDate').value = film.releaseDate || '';
-        document.getElementById('filmReleased').checked = film.isReleased || false;
+        if (empty) empty.style.display = 'none';
         
-        document.getElementById('film-modal-title').textContent = 'Изменить фильм';
-        showFilmForm();
-    } catch (error) {
-        alert(`Ошибка загрузки фильма: ${error.message}`);
-    }
-}
-
-async function deleteFilm(id) {
-    if (!confirm('Вы уверены, что хотите удалить этот фильм?')) return;
-    
-    try {
-        await api.deleteFilm(id);
-        alert('Фильм успешно удален!');
-        loadFilms();
-    } catch (error) {
-        alert(`Ошибка удаления фильма: ${error.message}`);
-    }
-}
-
-async function patchFilm(id) {
-    try {
-        await api.patchFilm(id, { patched: true, timestamp: new Date().toISOString() });
-        alert('PATCH успешно применен!');
-        loadFilms();
-    } catch (error) {
-        alert(`Ошибка применения PATCH: ${error.message}`);
-    }
-}
-
-async function generateRandomFilm() {
-    const genres = ['Боевик', 'Драма', 'Комедия', 'Фантастика', 'Триллер', 'Ужасы', 'Мелодрама', 'Детектив'];
-    const randomGenres = [...Array(Math.floor(Math.random() * 3) + 1)]
-        .map(() => genres[Math.floor(Math.random() * genres.length)]);
-    
-    const film = {
-        title: `Фильм ${Math.floor(Math.random() * 1000)}`,
-        director: `Режиссер ${Math.floor(Math.random() * 100)}`,
-        year: Math.floor(Math.random() * 30) + 1995,
-        duration: Math.floor(Math.random() * 120) + 90,
-        isReleased: Math.random() > 0.3,
-        genres: [...new Set(randomGenres)],
-        releaseDate: new Date(Date.now() - Math.random() * 10000000000).toISOString().split('T')[0]
-    };
-    
-    try {
-        await api.createFilm(film);
-        alert('Случайный фильм создан!');
-        loadFilms();
-        closeFilmForm();
-    } catch (error) {
-        alert(`Ошибка создания фильма: ${error.message}`);
-    }
-}
-
-// Функции для работы с сеансами
-async function loadSessions() {
-    const container = document.getElementById('sessions-container');
-    container.innerHTML = `
-        <div class="loading">
-            <div class="spinner"></div>
-            <p>Загрузка сеансов...</p>
-        </div>
-    `;
-
-    try {
-        sessionsData = await api.getSessions();
-        
-        if (sessionsData.length === 0) {
+        // Отображаем фильмы
+        if (container) {
             container.innerHTML = `
-                <div class="empty-state">
-                    <i class="fas fa-calendar-alt fa-3x"></i>
-                    <h3>Нет сеансов</h3>
-                    <p>Создайте первый сеанс, нажав кнопку "Добавить сеанс"</p>
-                </div>
+                <div class="films-grid" id="films-grid"></div>
             `;
-            return;
-        }
-
-        const filmMap = {};
-        filmsData.forEach(film => {
-            filmMap[film.id] = film.title;
-        });
-
-        container.innerHTML = `
-            <table class="sessions-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Фильм</th>
-                        <th>Зал</th>
-                        <th>Дата и время</th>
-                        <th>Цена</th>
-                        <th>Формат</th>
-                        <th>Места</th>
-                        <th>Действия</th>
-                    </tr>
-                </thead>
-                <tbody id="sessions-table-body"></tbody>
-            </table>
-        `;
-
-        const tbody = document.getElementById('sessions-table-body');
-        sessionsData.forEach(session => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${session.id}</td>
-                <td><strong>${filmMap[session.filmId] || `Фильм #${session.filmId}`}</strong></td>
-                <td><span class="badge badge-success">Зал ${session.hallNumber}</span></td>
-                <td>${new Date(session.dateTime).toLocaleString('ru-RU')}</td>
-                <td><strong>${session.price} ₽</strong></td>
-                <td><span class="badge ${session.is3D ? 'badge-success' : 'badge-warning'}">${session.is3D ? '3D' : '2D'}</span></td>
-                <td>
-                    <div>Доступно: ${session.availableSeats?.length || 0}</div>
-                    <div>Забронировано: ${session.bookedSeats?.length || 0}</div>
-                </td>
-                <td>
-                    <div style="display: flex; gap: 5px;">
-                        <button class="btn btn-primary btn-sm" onclick="editSession(${session.id})">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn btn-danger btn-sm" onclick="deleteSession(${session.id})">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                        <button class="btn btn-warning btn-sm" onclick="patchSession(${session.id})">
-                            <i class="fas fa-magic"></i>
-                        </button>
+            
+            const grid = document.getElementById('films-grid');
+            filmsData.forEach(film => {
+                const filmCard = document.createElement('div');
+                filmCard.className = 'film-card';
+                filmCard.innerHTML = `
+                    <div class="film-header">
+                        <h3>${film.title || 'Без названия'}</h3>
+                        <div class="film-year">${film.year || 'Не указан'}</div>
+                        <div class="film-badge">
+                            ${film.isReleased ? '🎬 Выпущен' : '⏳ Скоро'}
+                        </div>
                     </div>
-                </td>
-            `;
-            tbody.appendChild(row);
-        });
-    } catch (error) {
-        container.innerHTML = `
-            <div class="empty-state">
-                <i class="fas fa-exclamation-triangle fa-3x"></i>
-                <h3>Ошибка загрузки</h3>
-                <p>${error.message}</p>
-            </div>
-        `;
-    }
-}
-
-async function editSession(id) {
-    try {
-        const session = await api.getSession(id);
-        currentSessionId = id;
+                    <div class="film-body">
+                        <div class="film-info">
+                            <div class="film-info-item">
+                                <i class="fas fa-user-tie"></i>
+                                <span>Режиссер: ${film.director || 'Не указан'}</span>
+                            </div>
+                            <div class="film-info-item">
+                                <i class="fas fa-clock"></i>
+                                <span>Продолжительность: ${film.duration || 0} мин</span>
+                            </div>
+                            <div class="film-info-item">
+                                <i class="fas fa-calendar"></i>
+                                <span>Дата выпуска: ${film.releaseDate || 'Не указана'}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="film-genres">
+                            ${(film.genres || []).map(genre => `
+                                <span class="genre-tag">${genre}</span>
+                            `).join('')}
+                        </div>
+                        
+                        <div class="film-actions">
+                            <button class="btn btn-primary btn-sm" onclick="editFilm(${film.id})">
+                                <i class="fas fa-edit"></i> Изменить
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteFilm(${film.id})">
+                                <i class="fas fa-trash"></i> Удалить
+                            </button>
+                            <button class="btn btn-warning btn-sm" onclick="patchFilm(${film.id})">
+                                <i class="fas fa-magic"></i> PATCH
+                            </button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(filmCard);
+            });
+        }
         
-        document.getElementById('sessionId').value = session.id;
-        document.getElementById('sessionFilmId').value = session.filmId || '';
-        document.getElementById('sessionHall').value = session.hallNumber || '1';
-        document.getElementById('sessionPrice').value = session.price || '';
-        document.getElementById('sessionDateTime').value = session.dateTime ? session.dateTime.slice(0, 16) : '';
-        document.getElementById('sessionAvailable').value = (session.availableSeats || []).join(', ');
-        document.getElementById('sessionBooked').value = (session.bookedSeats || []).join(', ');
-        document.getElementById('session3D').checked = session.is3D || false;
-        
-        document.getElementById('session-modal-title').textContent = 'Изменить сеанс';
-        showSessionForm();
+        updateCounters();
     } catch (error) {
-        alert(`Ошибка загрузки сеанса: ${error.message}`);
+        console.error('Ошибка загрузки фильмов:', error);
+        showNotification(`Ошибка загрузки фильмов: ${error.message}`, 'error');
+    } finally {
+        if (loading) loading.style.display = 'none';
     }
 }
 
-async function deleteSession(id) {
-    if (!confirm('Вы уверены, что хотите удалить этот сеанс?')) return;
-    
-    try {
-        await api.deleteSession(id);
-        alert('Сеанс успешно удален!');
-        loadSessions();
-    } catch (error) {
-        alert(`Ошибка удаления сеанса: ${error.message}`);
-    }
-}
-
-async function patchSession(id) {
-    try {
-        await api.patchSession(id, { patched: true, timestamp: new Date().toISOString() });
-        alert('PATCH успешно применен!');
-        loadSessions();
-    } catch (error) {
-        alert(`Ошибка применения PATCH: ${error.message}`);
-    }
-}
-
-async function generateRandomSession() {
-    const halls = [1, 2, 3, 4, 5];
-    const session = {
-        filmId: Math.floor(Math.random() * 10) + 1,
-        hallNumber: halls[Math.floor(Math.random() * halls.length)],
-        dateTime: new Date(Date.now() + Math.random() * 604800000).toISOString(),
-        price: Math.floor(Math.random() * 200) + 300,
-        is3D: Math.random() > 0.5,
-        availableSeats: Array.from({length: Math.floor(Math.random() * 30) + 20}, (_, i) => i + 1),
-        bookedSeats: Array.from({length: Math.floor(Math.random() * 20)}, (_, i) => i + 51)
-    };
-    
-    try {
-        await api.createSession(session);
-        alert('Случайный сеанс создан!');
-        loadSessions();
-        closeSessionForm();
-    } catch (error) {
-        alert(`Ошибка создания сеанса: ${error.message}`);
-    }
-}
-
-// Поиск и фильтрация
 function searchFilms() {
     const searchTerm = document.getElementById('filmSearch').value.toLowerCase();
     const cards = document.querySelectorAll('.film-card');
@@ -455,23 +315,51 @@ function searchFilms() {
     });
 }
 
-function filterSessions() {
-    const hallFilter = document.getElementById('hallFilter').value;
-    const rows = document.querySelectorAll('#sessions-table-body tr');
+function showFilmForm() {
+    const modal = document.getElementById('film-modal');
+    const title = document.getElementById('film-modal-title');
     
-    rows.forEach(row => {
-        const hallCell = row.cells[2].textContent;
-        if (!hallFilter || hallCell.includes(`Зал ${hallFilter}`)) {
-            row.style.display = '';
-        } else {
-            row.style.display = 'none';
-        }
-    });
+    if (modal && title) {
+        modal.classList.add('active');
+        title.textContent = 'Добавить фильм';
+        document.getElementById('filmForm').reset();
+        currentFilmId = null;
+    }
 }
 
-// Обработчики форм
-document.getElementById('filmForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
+function closeFilmForm() {
+    const modal = document.getElementById('film-modal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
+}
+
+async function editFilm(id) {
+    try {
+        const film = await api.getFilm(id);
+        currentFilmId = id;
+        
+        document.getElementById('filmId').value = film.id;
+        document.getElementById('filmTitle').value = film.title || '';
+        document.getElementById('filmDirector').value = film.director || '';
+        document.getElementById('filmYear').value = film.year || '';
+        document.getElementById('filmDuration').value = film.duration || '';
+        document.getElementById('filmReleased').checked = film.isReleased || false;
+        document.getElementById('filmGenres').value = (film.genres || []).join(', ');
+        document.getElementById('filmReleaseDate').value = film.releaseDate || '';
+        
+        const title = document.getElementById('film-modal-title');
+        if (title) title.textContent = 'Изменить фильм';
+        
+        const modal = document.getElementById('film-modal');
+        if (modal) modal.classList.add('active');
+    } catch (error) {
+        showNotification(`Ошибка загрузки фильма: ${error.message}`, 'error');
+    }
+}
+
+async function submitFilmForm(event) {
+    event.preventDefault();
     
     const film = {
         title: document.getElementById('filmTitle').value,
@@ -486,21 +374,223 @@ document.getElementById('filmForm').addEventListener('submit', async function(e)
     try {
         if (currentFilmId) {
             await api.updateFilm(currentFilmId, film);
-            alert('Фильм успешно обновлен!');
+            showNotification('Фильм успешно обновлен!', 'success');
         } else {
             await api.createFilm(film);
-            alert('Фильм успешно создан!');
+            showNotification('Фильм успешно создан!', 'success');
         }
         
         closeFilmForm();
-        loadFilms();
+        await getFilms();
     } catch (error) {
-        alert(`Ошибка сохранения фильма: ${error.message}`);
+        showNotification(`Ошибка сохранения фильма: ${error.message}`, 'error');
     }
-});
+}
 
-document.getElementById('sessionForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
+async function deleteFilm(id) {
+    if (!confirm('Вы уверены, что хотите удалить этот фильм?')) return;
+    
+    try {
+        await api.deleteFilm(id);
+        showNotification('Фильм успешно удален!', 'success');
+        await getFilms();
+    } catch (error) {
+        showNotification(`Ошибка удаления фильма: ${error.message}`, 'error');
+    }
+}
+
+async function patchFilm(id) {
+    try {
+        const patchData = {
+            patched: true,
+            patchTimestamp: new Date().toISOString()
+        };
+        
+        await api.patchFilm(id, patchData);
+        showNotification('PATCH успешно применен!', 'success');
+        await getFilms();
+    } catch (error) {
+        showNotification(`Ошибка применения PATCH: ${error.message}`, 'error');
+    }
+}
+
+async function generateRandomFilm() {
+    try {
+        const genres = ['Боевик', 'Драма', 'Комедия', 'Фантастика', 'Триллер', 'Ужасы', 'Мелодрама', 'Детектив'];
+        const randomGenres = [...Array(Math.floor(Math.random() * 3) + 1)]
+            .map(() => genres[Math.floor(Math.random() * genres.length)]);
+        
+        const film = {
+            title: `Фильм ${Math.floor(Math.random() * 1000)}`,
+            director: `Режиссер ${Math.floor(Math.random() * 100)}`,
+            year: Math.floor(Math.random() * 30) + 1995,
+            duration: Math.floor(Math.random() * 120) + 90,
+            isReleased: Math.random() > 0.3,
+            genres: [...new Set(randomGenres)],
+            releaseDate: new Date(Date.now() - Math.random() * 10000000000).toISOString().split('T')[0]
+        };
+        
+        await api.createFilm(film);
+        showNotification('Случайный фильм успешно создан!', 'success');
+        await getFilms();
+    } catch (error) {
+        showNotification(`Ошибка создания фильма: ${error.message}`, 'error');
+    }
+}
+
+// Функции для работы с сеансами
+async function getSessions() {
+    const loading = document.getElementById('sessions-loading');
+    const empty = document.getElementById('sessions-empty');
+    const container = document.getElementById('sessions-container');
+    
+    if (loading) loading.style.display = 'flex';
+    if (container) container.innerHTML = '';
+    
+    try {
+        sessionsData = await api.getSessions();
+        
+        if (!sessionsData || sessionsData.length === 0) {
+            if (loading) loading.style.display = 'none';
+            if (empty) empty.style.display = 'block';
+            updateCounters();
+            return;
+        }
+        
+        if (empty) empty.style.display = 'none';
+        
+        // Получаем названия фильмов для отображения
+        const filmMap = {};
+        filmsData.forEach(film => {
+            filmMap[film.id] = film.title;
+        });
+        
+        // Отображаем сеансы в таблице
+        if (container) {
+            container.innerHTML = `
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Фильм</th>
+                                <th>Зал</th>
+                                <th>Дата и время</th>
+                                <th>Цена</th>
+                                <th>Формат</th>
+                                <th>Места</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sessions-table-body"></tbody>
+                    </table>
+                </div>
+            `;
+            
+            const tbody = document.getElementById('sessions-table-body');
+            sessionsData.forEach(session => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${session.id}</td>
+                    <td><strong>${filmMap[session.filmId] || `Фильм #${session.filmId}`}</strong></td>
+                    <td><span class="badge badge-info">Зал ${session.hallNumber}</span></td>
+                    <td>${formatDate(session.dateTime)}</td>
+                    <td><strong>${session.price} ₽</strong></td>
+                    <td>
+                        <span class="badge ${session.is3D ? 'badge-success' : 'badge-warning'}">
+                            ${session.is3D ? '3D' : '2D'}
+                        </span>
+                    </td>
+                    <td>
+                        <div>Доступно: ${session.availableSeats?.length || 0}</div>
+                        <div>Забронировано: ${session.bookedSeats?.length || 0}</div>
+                    </td>
+                    <td>
+                        <div style="display: flex; gap: 5px;">
+                            <button class="btn btn-primary btn-sm" onclick="editSession(${session.id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteSession(${session.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            <button class="btn btn-warning btn-sm" onclick="patchSession(${session.id})">
+                                <i class="fas fa-magic"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        updateCounters();
+    } catch (error) {
+        console.error('Ошибка загрузки сеансов:', error);
+        showNotification(`Ошибка загрузки сеансов: ${error.message}`, 'error');
+    } finally {
+        if (loading) loading.style.display = 'none';
+    }
+}
+
+function filterSessions() {
+    const hallFilter = document.getElementById('hallFilter').value;
+    const rows = document.querySelectorAll('#sessions-table-body tr');
+    
+    rows.forEach(row => {
+        const hallCell = row.cells[2].textContent;
+        if (!hallFilter || hallCell.includes(`Зал ${hallFilter}`)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+function showSessionForm() {
+    const modal = document.getElementById('session-modal');
+    const title = document.getElementById('session-modal-title');
+    
+    if (modal && title) {
+        modal.classList.add('active');
+        title.textContent = 'Добавить сеанс';
+        document.getElementById('sessionForm').reset();
+        currentSessionId = null;
+    }
+}
+
+function closeSessionForm() {
+    const modal = document.getElementById('session-modal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
+}
+
+async function editSession(id) {
+    try {
+        const session = await api.getSession(id);
+        currentSessionId = id;
+        
+        document.getElementById('sessionId').value = session.id;
+        document.getElementById('sessionFilmId').value = session.filmId || '';
+        document.getElementById('sessionHall').value = session.hallNumber || '1';
+        document.getElementById('sessionDateTime').value = session.dateTime ? session.dateTime.slice(0, 16) : '';
+        document.getElementById('sessionPrice').value = session.price || '';
+        document.getElementById('session3D').checked = session.is3D || false;
+        document.getElementById('sessionAvailable').value = (session.availableSeats || []).join(', ');
+        document.getElementById('sessionBooked').value = (session.bookedSeats || []).join(', ');
+        
+        const title = document.getElementById('session-modal-title');
+        if (title) title.textContent = 'Изменить сеанс';
+        
+        const modal = document.getElementById('session-modal');
+        if (modal) modal.classList.add('active');
+    } catch (error) {
+        showNotification(`Ошибка загрузки сеанса: ${error.message}`, 'error');
+    }
+}
+
+async function submitSessionForm(event) {
+    event.preventDefault();
     
     const parseSeats = (str) => {
         if (!str) return [];
@@ -522,37 +612,184 @@ document.getElementById('sessionForm').addEventListener('submit', async function
     try {
         if (currentSessionId) {
             await api.updateSession(currentSessionId, session);
-            alert('Сеанс успешно обновлен!');
+            showNotification('Сеанс успешно обновлен!', 'success');
         } else {
             await api.createSession(session);
-            alert('Сеанс успешно создан!');
+            showNotification('Сеанс успешно создан!', 'success');
         }
         
         closeSessionForm();
-        loadSessions();
+        await getSessions();
     } catch (error) {
-        alert(`Ошибка сохранения сеанса: ${error.message}`);
+        showNotification(`Ошибка сохранения сеанса: ${error.message}`, 'error');
     }
-});
+}
 
-// Проверка состояния сервера
-async function checkServerStatus() {
+async function deleteSession(id) {
+    if (!confirm('Вы уверены, что хотите удалить этот сеанс?')) return;
+    
     try {
-        await api.getFilms();
-        document.querySelector('#server-status .status-badge').className = 'status-badge online';
-        document.querySelector('#server-status .status-badge').textContent = 'Онлайн';
+        await api.deleteSession(id);
+        showNotification('Сеанс успешно удален!', 'success');
+        await getSessions();
     } catch (error) {
-        document.querySelector('#server-status .status-badge').className = 'status-badge offline';
-        document.querySelector('#server-status .status-badge').textContent = 'Офлайн';
+        showNotification(`Ошибка удаления сеанса: ${error.message}`, 'error');
+    }
+}
+
+async function patchSession(id) {
+    try {
+        const patchData = {
+            patched: true,
+            patchTimestamp: new Date().toISOString()
+        };
+        
+        await api.patchSession(id, patchData);
+        showNotification('PATCH успешно применен к сеансу!', 'success');
+        await getSessions();
+    } catch (error) {
+        showNotification(`Ошибка применения PATCH: ${error.message}`, 'error');
+    }
+}
+
+async function generateRandomSession() {
+    try {
+        const halls = [1, 2, 3, 4, 5];
+        const session = {
+            filmId: Math.floor(Math.random() * 10) + 1,
+            hallNumber: halls[Math.floor(Math.random() * halls.length)],
+            dateTime: new Date(Date.now() + Math.random() * 604800000).toISOString(),
+            price: Math.floor(Math.random() * 200) + 300,
+            is3D: Math.random() > 0.5,
+            availableSeats: Array.from({length: Math.floor(Math.random() * 30) + 20}, (_, i) => i + 1),
+            bookedSeats: Array.from({length: Math.floor(Math.random() * 20)}, (_, i) => i + 51)
+        };
+        
+        await api.createSession(session);
+        showNotification('Случайный сеанс создан!', 'success');
+        await getSessions();
+    } catch (error) {
+        showNotification(`Ошибка создания сеанса: ${error.message}`, 'error');
+    }
+}
+
+// Вспомогательные функции
+function updateCounters() {
+    const filmsCount = document.getElementById('films-count');
+    const sessionsCount = document.getElementById('sessions-count');
+    
+    if (filmsCount) filmsCount.textContent = filmsData.length;
+    if (sessionsCount) sessionsCount.textContent = sessionsData.length;
+}
+
+// Мониторинг сервера
+async function monitorServer() {
+    try {
+        const isAlive = await api.checkHealth();
+        const statusElement = document.getElementById('server-status');
+        const footerStatus = document.getElementById('server-status-footer');
+        
+        if (isAlive) {
+            if (statusElement) {
+                statusElement.textContent = '🟢';
+                statusElement.title = 'Сервер работает';
+            }
+            if (footerStatus) {
+                footerStatus.innerHTML = '<span style="color: #2a9d8f">🟢 Сервер работает</span>';
+            }
+        } else {
+            if (statusElement) {
+                statusElement.textContent = '🔴';
+                statusElement.title = 'Сервер не отвечает';
+            }
+            if (footerStatus) {
+                footerStatus.innerHTML = '<span style="color: #e63946">🔴 Сервер не отвечает</span>';
+            }
+            showNotification('Сервер не отвечает. Проверьте подключение.', 'error');
+        }
+    } catch (error) {
+        console.log('Ошибка мониторинга сервера:', error);
     }
 }
 
 // Инициализация при загрузке страницы
-document.addEventListener('DOMContentLoaded', function() {
-    loadFilms();
-    loadSessions();
-    checkServerStatus();
+document.addEventListener('DOMContentLoaded', async () => {
+    // Проверяем сервер
+    await monitorServer();
     
-    // Обновляем статус каждые 30 секунд
-    setInterval(checkServerStatus, 30000);
+    // Загружаем данные для активной вкладки
+    const activeTab = document.querySelector('.tab.active');
+    if (activeTab && activeTab.getAttribute('onclick')?.includes("'films'")) {
+        await getFilms();
+    } else {
+        await getSessions();
+    }
+    
+    // Устанавливаем интервалы для обновления
+    setInterval(monitorServer, 30000);
+    
+    // Назначаем обработчики форм
+    const filmForm = document.getElementById('filmForm');
+    if (filmForm) {
+        filmForm.addEventListener('submit', submitFilmForm);
+    }
+    
+    const sessionForm = document.getElementById('sessionForm');
+    if (sessionForm) {
+        sessionForm.addEventListener('submit', submitSessionForm);
+    }
+    
+    // Закрытие модальных окон
+    const closeButtons = document.querySelectorAll('.close-btn');
+    closeButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const modal = this.closest('.modal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
+        });
+    });
+    
+    // Закрытие модальных окон при клике вне
+    window.addEventListener('click', (event) => {
+        const filmModal = document.getElementById('film-modal');
+        const sessionModal = document.getElementById('session-modal');
+        
+        if (filmModal && event.target === filmModal) {
+            closeFilmForm();
+        }
+        
+        if (sessionModal && event.target === sessionModal) {
+            closeSessionForm();
+        }
+    });
+    
+    // Закрытие по Escape
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            closeFilmForm();
+            closeSessionForm();
+        }
+    });
 });
+
+// Сделаем функции глобальными для доступа из HTML
+window.showTab = showTab;
+window.toggleMobileMenu = toggleMobileMenu;
+window.goBack = goBack;
+window.getFilms = getFilms;
+window.getSessions = getSessions;
+window.searchFilms = searchFilms;
+window.showFilmForm = showFilmForm;
+window.closeFilmForm = closeFilmForm;
+window.editFilm = editFilm;
+window.deleteFilm = deleteFilm;
+window.patchFilm = patchFilm;
+window.generateRandomFilm = generateRandomFilm;
+window.filterSessions = filterSessions;
+window.showSessionForm = showSessionForm;
+window.closeSessionForm = closeSessionForm;
+window.editSession = editSession;
+window.deleteSession = deleteSession;
+window.patchSession = patchSession;
+window.generateRandomSession = generateRandomSession;

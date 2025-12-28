@@ -1,32 +1,5 @@
 [
   {
-    "id": 1,
-    "filmId": 1,
-    "hallNumber": 3,
-    "dateTime": "2024-12-15T19:30:00.000Z",
-    "price": 400,
-    "is3D": false,
-    "availableSeats": [
-      1,
-      2,
-      3,
-      4,
-      5,
-      6,
-      7,
-      8,
-      9,
-      10
-    ],
-    "bookedSeats": [
-      11,
-      12,
-      13,
-      14,
-      15
-    ]
-  },
-  {
     "id": 2,
     "filmId": 2,
     "hallNumber": 5,

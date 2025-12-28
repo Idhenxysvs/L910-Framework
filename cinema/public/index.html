@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎬 Управление кинотеатром</title>
+    <link rel="stylesheet" href="/public/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1><i class="fas fa-film"></i> Управление кинотеатром</h1>
+            <p>Версия 3.0 - CRUD для фильмов и сеансов</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('films')">
+                <i class="fas fa-video"></i> Фильмы
+            </button>
+            <button class="tab" onclick="showTab('sessions')">
+                <i class="fas fa-calendar-alt"></i> Сеансы
+            </button>
+        </div>
+
+        <!-- Вкладка фильмов -->
+        <div id="films-tab" class="tab-content active">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Управление фильмами</h2>
+                    <button class="btn btn-primary" onclick="loadFilms()">
+                        <i class="fas fa-sync-alt"></i> Обновить
+                    </button>
+                    <button class="btn btn-success" onclick="showFilmForm()">
+                        <i class="fas fa-plus"></i> Добавить фильм
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="search-box">
+                        <input type="text" id="filmSearch" placeholder="Поиск фильмов..." oninput="searchFilms()">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    
+                    <div id="films-container">
+                        <!-- Фильмы будут загружены через JS -->
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <p>Загрузка фильмов...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Вкладка сеансов -->
+        <div id="sessions-tab" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Управление сеансами</h2>
+                    <button class="btn btn-primary" onclick="loadSessions()">
+                        <i class="fas fa-sync-alt"></i> Обновить
+                    </button>
+                    <button class="btn btn-success" onclick="showSessionForm()">
+                        <i class="fas fa-plus"></i> Добавить сеанс
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="filters">
+                        <select id="hallFilter" onchange="filterSessions()">
+                            <option value="">Все залы</option>
+                            <option value="1">Зал 1</option>
+                            <option value="2">Зал 2</option>
+                            <option value="3">Зал 3</option>
+                            <option value="4">Зал 4</option>
+                            <option value="5">Зал 5</option>
+                        </select>
+                    </div>
+                    
+                    <div id="sessions-container">
+                        <!-- Сеансы будут загружены через JS -->
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <p>Загрузка сеансов...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Модальное окно для фильмов -->
+    <div id="film-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-film"></i> <span id="film-modal-title">Добавить фильм</span></h3>
+                <button class="close-btn" onclick="closeFilmForm()">&times;</button>
+            </div>
+            <form id="filmForm">
+                <input type="hidden" id="filmId">
+                <div class="form-group">
+                    <label for="filmTitle"><i class="fas fa-heading"></i> Название</label>
+                    <input type="text" id="filmTitle" required>
+                </div>
+                <div class="form-group">
+                    <label for="filmDirector"><i class="fas fa-user-tie"></i> Режиссер</label>
+                    <input type="text" id="filmDirector">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="filmYear"><i class="fas fa-calendar"></i> Год</label>
+                        <input type="number" id="filmYear" min="1900" max="2024">
+                    </div>
+                    <div class="form-group">
+                        <label for="filmDuration"><i class="fas fa-clock"></i> Длительность (мин)</label>
+                        <input type="number" id="filmDuration" min="1">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="filmGenres"><i class="fas fa-tags"></i> Жанры (через запятую)</label>
+                    <input type="text" id="filmGenres" placeholder="Боевик, Драма, Комедия">
+                </div>
+                <div class="form-group">
+                    <label for="filmReleaseDate"><i class="fas fa-calendar-day"></i> Дата выпуска</label>
+                    <input type="date" id="filmReleaseDate">
+                </div>
+                <div class="form-group checkbox">
+                    <label>
+                        <input type="checkbox" id="filmReleased">
+                        <i class="fas fa-check-circle"></i> Фильм выпущен
+                    </label>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Сохранить
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="closeFilmForm()">
+                        <i class="fas fa-times"></i> Отмена
+                    </button>
+                    <button type="button" class="btn btn-outline" onclick="generateRandomFilm()">
+                        <i class="fas fa-random"></i> Случайные данные
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Модальное окно для сеансов -->
+    <div id="session-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-calendar-alt"></i> <span id="session-modal-title">Добавить сеанс</span></h3>
+                <button class="close-btn" onclick="closeSessionForm()">&times;</button>
+            </div>
+            <form id="sessionForm">
+                <input type="hidden" id="sessionId">
+                <div class="form-group">
+                    <label for="sessionFilmId"><i class="fas fa-film"></i> ID фильма</label>
+                    <input type="number" id="sessionFilmId" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="sessionHall"><i class="fas fa-door-open"></i> Зал</label>
+                        <select id="sessionHall">
+                            <option value="1">Зал 1</option>
+                            <option value="2">Зал 2</option>
+                            <option value="3">Зал 3</option>
+                            <option value="4">Зал 4</option>
+                            <option value="5">Зал 5</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="sessionPrice"><i class="fas fa-ticket-alt"></i> Цена (руб)</label>
+                        <input type="number" id="sessionPrice" min="0">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="sessionDateTime"><i class="fas fa-clock"></i> Дата и время</label>
+                    <input type="datetime-local" id="sessionDateTime" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="sessionAvailable"><i class="fas fa-chair"></i> Доступные места</label>
+                        <input type="text" id="sessionAvailable" placeholder="1-50">
+                    </div>
+                    <div class="form-group">
+                        <label for="sessionBooked"><i class="fas fa-chair"></i> Забронированные места</label>
+                        <input type="text" id="sessionBooked" placeholder="51-100">
+                    </div>
+                </div>
+                <div class="form-group checkbox">
+                    <label>
+                        <input type="checkbox" id="session3D">
+                        <i class="fas fa-vr-cardboard"></i> 3D сеанс
+                    </label>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Сохранить
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="closeSessionForm()">
+                        <i class="fas fa-times"></i> Отмена
+                    </button>
+                    <button type="button" class="btn btn-outline" onclick="generateRandomSession()">
+                        <i class="fas fa-random"></i> Случайные данные
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/public/script.js"></script>
+</body>
+</html>

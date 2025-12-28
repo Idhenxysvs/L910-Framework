@@ -8,34 +8,28 @@ class App {
     this.router = new Router();
     this.server = http.createServer(this.handleRequest.bind(this));
   }
-
   get(path, handler) {
     this.router.get(path, handler);
   }
-
   post(path, handler) {
     this.router.post(path, handler);
   }
-
   put(path, handler) {
     this.router.put(path, handler);
   }
-
   patch(path, handler) {
     this.router.patch(path, handler);
   }
-
   delete(path, handler) {
     this.router.delete(path, handler);
   }
-
   use(middleware) {
     this.router.use(middleware);
   }
 
   async handleRequest(req, res) {
     req.url = req.url.split('?')[0];
-    
+
     res.json = (data) => {
       res.setHeader('Content-Type', 'application/json');
       res.end(JSON.stringify(data));
@@ -55,9 +49,8 @@ class App {
       const path = require('path');
       const filePath = path.join(__dirname, '..', req.url);
       fs.readFile(filePath, (err, content) => {
-        if (err) {
-          res.status(404).send('Not Found');
-        } else {
+        if (err) { res.status(404).send('Not Found'); }
+        else {
           const ext = path.extname(filePath);
           const mimeTypes = {
             '.html': 'text/html',
@@ -105,9 +98,8 @@ class App {
         console.error('Route error:', error);
         res.status(500).json({ error: 'Internal Server Error' });
       }
-    } else {
-      res.status(404).json({ error: 'Route not found' });
     }
+    else { res.status(404).json({ error: 'Route not found' }); }
   }
 
   listen(port, callback) {
@@ -144,21 +136,12 @@ app.get('/', (req, res) => {
 });
 
 const PORT = process.env.PORT || 3003;
+const packageJson = require('../package.json');
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-  console.log('API endpoints:');
-  console.log('  GET    /concerts');
-  console.log('  GET    /concerts/:id');
-  console.log('  POST   /concerts');
-  console.log('  PUT    /concerts/:id');
-  console.log('  PATCH  /concerts/:id');
-  console.log('  DELETE /concerts/:id');
-  console.log('  GET    /artists');
-  console.log('  GET    /artists/:id');
-  console.log('  POST   /artists');
-  console.log('  PUT    /artists/:id');
-  console.log('  PATCH  /artists/:id');
-  console.log('  DELETE /artists/:id');
+  console.log(`============================================`);
+  console.log(`💼 Менеджер концертов — ${packageJson.version}:`);
+  console.log(`📶 Адрес сайта – http://localhost:${PORT}`);
+  console.log('📦 API: документация в README проекта');
+  console.log(`============================================`);
 });
-
 module.exports = App;

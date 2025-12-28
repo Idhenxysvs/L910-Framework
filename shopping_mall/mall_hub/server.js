@@ -5,6 +5,7 @@ const apiRoutes = require('./routes/api');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const packageJson = require('./package.json');
 
 app.use(cors());
 app.use(express.json());
@@ -17,23 +18,10 @@ app.get('*', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`
-    КОНФИГУРАЦИЯ MALL_HUB
-    =================================
-    
-    🚀 Порт: ${PORT}
-    📍 URL: http://localhost:${PORT}
-    📡 API: http://localhost:${PORT}/api
-    
-    📋 API команды:
-    GET  /api/projects          - Список проектов
-    POST /api/projects/start    - Запуск проекта
-    POST /api/projects/stop     - Остановка проекта
-    POST /api/projects/restart  - Перезапуск проекта
-    GET  /api/status            - Статус всех проектов
-    GET  /api/health            - Проверка здоровья
-    
-    =================================
-    `);
+    console.log(`============================================`);
+    console.log(`💼 Хаб ТЦ 'Крышталь' — ${packageJson.version}:`);
+    console.log(`📶 Адрес сайта – http://localhost:${PORT}`);
+    console.log('📦 API: документация в README проекта');
+    console.log(`============================================`);
 });
 module.exports = app;

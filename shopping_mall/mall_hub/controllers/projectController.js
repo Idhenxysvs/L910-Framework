@@ -31,7 +31,6 @@ class ProjectController {
         try {
             const status = processManager.getStatus();
             
-            // Проверяем доступность портов
             const projectsStatus = Object.values(status);
             
             res.json({

@@ -1,22 +1,23 @@
-console.log('Запуск ShopingMall Project ');
-console.log('\n- Mall_HUB запущен: ✅')
+console.log("Запуск ShopingMall 'Kristall' ");
+console.log('\n- Mall_HUB: ✅')
 require('./mall_hub/server.js');
 
 setTimeout(() => {
-    console.log('\n- ConcertsManager запущен: ✅')
+    console.log('\n- ConcertsFlow: ✅')
     require('./departments/concerts/src/server.js');
 }, 1000);
 
 setTimeout(() => {
     console.log(`
-КОНФИГУРАЦИЯ ShoppingMall Project:
+КОНФИГУРАЦИЯ ShoppingMall Project L9-10 Web:
+===========================================================
+Mall_HUB Kristall:                  http://localhost:3000
+Кинотеатр '':                       http://localhost:3001
+Тренажёрный зал 'СИЛАЧ':            http://localhost:3002
+Раписание концертов 'ConcertFlow':  http://localhost:3003
+Банк '':                            http://localhost:3004
+===========================================================
 
-Mall_HUB:       http://localhost:3000
-Кинотеатр:      http://localhost:3001
-ТЗ 'СИЛАЧ':     http://localhost:3002
-ConcertFlow:    http://localhost:3003
-Банк МММ:       http://localhost:3004
-
-=========================
+|  ИНФОРМАЦИЯ ПО ПРОЕКТУ И ЕГО РАЗРАБОТЧИКАХ В README.md  |
 `);
 }, 2000);

@@ -1136,3 +1136,193 @@ html {
 .theme-transition * {
   transition: background-color 0.5s ease, border-color 0.5s ease, color 0.5s ease, box-shadow 0.5s ease;
 }
+
+.hub-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 10px;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-secondary);
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    margin: 0 20px;
+    white-space: nowrap;
+}
+
+.hub-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, var(--accent-hover) 0%, var(--accent) 100%);
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.hub-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+    border-color: var(--accent-light);
+}
+
+.hub-btn:hover::before {
+    opacity: 1;
+}
+
+.hub-btn i {
+    font-size: 1.1rem;
+    transition: transform 0.3s ease;
+}
+
+.hub-btn:hover i {
+    transform: scale(1.1);
+}
+
+.hub-label {
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
+.theme-red .hub-btn {
+    background: linear-gradient(135deg, #f00000 0%, #ff3333 100%);
+    border-color: #f00000;
+    box-shadow: 0 4px 15px rgba(240, 0, 0, 0.3);
+}
+
+.theme-red .hub-btn::before {
+    background: linear-gradient(135deg, #d10000 0%, #f00000 100%);
+}
+
+.theme-red .hub-btn:hover {
+    box-shadow: 0 8px 25px rgba(240, 0, 0, 0.5);
+    border-color: #ff3333;
+}
+
+@media (max-width: 1024px) {
+    .header-content {
+        flex-wrap: wrap;
+        gap: 15px;
+        justify-content: center;
+        padding-top: 60px;
+    }
+    
+    .hub-btn {
+        order: 3;
+        width: calc(100% - 30px);
+        max-width: 300px;
+        margin: 10px auto 0;
+        justify-content: center;
+    }
+    
+    .stats {
+        order: 2;
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .logo {
+        order: 1;
+        width: 100%;
+        text-align: center;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .hub-btn {
+        padding: 10px 15px;
+        font-size: 0.85rem;
+    }
+    
+    .hub-label {
+        display: inline;
+    }
+}
+
+@media (max-width: 480px) {
+    .hub-btn {
+        padding: 8px 12px;
+        gap: 8px;
+    }
+    
+    .hub-label {
+        font-size: 0.85rem;
+    }
+    
+    .hub-btn i {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .hub-label {
+        display: none;
+    }
+    
+    .hub-btn {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        justify-content: center;
+        padding: 0;
+    }
+    
+    .hub-btn i {
+        font-size: 1.2rem;
+        margin: 0;
+    }
+}
+
+@keyframes slideInHubBtn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hub-btn {
+    animation: slideInHubBtn 0.5s ease 0.2s both;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+    }
+    50% {
+        box-shadow: 0 4px 20px rgba(59, 130, 246, 0.5);
+    }
+    100% {
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+    }
+}
+
+.theme-red .hub-btn {
+    animation: pulseRed 2s infinite;
+}
+
+@keyframes pulseRed {
+    0% {
+        box-shadow: 0 4px 15px rgba(240, 0, 0, 0.3);
+    }
+    50% {
+        box-shadow: 0 4px 20px rgba(240, 0, 0, 0.5);
+    }
+    100% {
+        box-shadow: 0 4px 15px rgba(240, 0, 0, 0.3);
+    }
+}

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Банковская система</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/public/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+    <div class="header-content header-with-button">
+        <button class="home-button" onclick="window.location.href = 'http://localhost:3000/'">
+            <i class="fas fa-home"></i> Главная
+        </button>
+        <p class="subtitle">Система управления клиентами и счетами</p>
+    </div>
+    </header>
+
+        <nav>
+            <div class="nav-buttons">
+                <button class="nav-btn active" data-section="clients">
+                    <i class="fas fa-users"></i> Клиенты
+                </button>
+                <button class="nav-btn" data-section="accounts">
+                    <i class="fas fa-credit-card"></i> Счета
+                </button>
+                <button class="nav-btn" data-section="add-client">
+                    <i class="fas fa-user-plus"></i> Новый клиент
+                </button>
+                <button class="nav-btn" data-section="add-account">
+                    <i class="fas fa-plus-circle"></i> Новый счет
+                </button>
+            </div>
+        </nav>
+
+        <main>
+            <section id="clients" class="content-section active">
+                <div class="section-header">
+                    <h2><i class="fas fa-users"></i> Клиенты банка</h2>
+                    <button class="btn secondary" onclick="loadClients()">
+                        <i class="fas fa-sync-alt"></i> Обновить
+                    </button>
+                </div>
+                <div class="cards-container" id="clients-container"></div>
+            </section>
+
+            <section id="accounts" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-credit-card"></i> Банковские счета</h2>
+                    <button class="btn secondary" onclick="loadAccounts()">
+                        <i class="fas fa-sync-alt"></i> Обновить
+                    </button>
+                </div>
+                <div class="cards-container" id="accounts-container"></div>
+            </section>
+
+            <section id="add-client" class="content-section">
+                <div class="form-container">
+                    <h2><i class="fas fa-user-plus"></i> Новый клиент</h2>
+                    <form id="client-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="fullName"><i class="fas fa-user"></i> ФИО / Название:</label>
+                                <input type="text" id="fullName" placeholder="Иванов Иван Иванович" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="clientType"><i class="fas fa-user-tag"></i> Тип клиента:</label>
+                                <select id="clientType" required>
+                                    <option value="individual">Физическое лицо</option>
+                                    <option value="business">Юридическое лицо</option>
+                                    <option value="vip">VIP клиент</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="passport"><i class="fas fa-id-card"></i> Паспорт:</label>
+                                <input type="text" id="passport" placeholder="4501123456" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone"><i class="fas fa-phone"></i> Телефон:</label>
+                                <input type="tel" id="phone" placeholder="+375 (25) 756-40-65" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="email"><i class="fas fa-envelope"></i> Email:</label>
+                                <input type="email" id="email" placeholder="client@example.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="income"><i class="fas fa-money-bill-wave"></i> Доход (BYN/мес):</label>
+                                <input type="number" id="income" placeholder="50000" min="0">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="address"><i class="fas fa-map-marker-alt"></i> Адрес:</label>
+                            <input type="text" id="address" placeholder="г. Москва, ул. Пушкина, д. 10">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="isActive" checked>
+                                <span><i class="fas fa-check-circle"></i> Активный клиент</span>
+                            </label>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn success">
+                                <i class="fas fa-check"></i> Добавить клиента
+                            </button>
+                            <button type="button" class="btn danger" onclick="showSection('clients')">
+                                <i class="fas fa-times"></i> Отмена
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <section id="add-account" class="content-section">
+                <div class="form-container">
+                    <h2><i class="fas fa-plus-circle"></i> Новый счет</h2>
+                    <form id="account-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="clientSelect"><i class="fas fa-user"></i> Клиент:</label>
+                                <select id="clientSelect" required>
+                                    <option value="">Выберите клиента</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="accountType"><i class="fas fa-credit-card"></i> Тип счета:</label>
+                                <select id="accountType" required>
+                                    <option value="checking">Расчетный</option>
+                                    <option value="savings">Накопительный</option>
+                                    <option value="credit">Кредитный</option>
+                                    <option value="deposit">Депозитный</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="currency"><i class="fas fa-money-bill"></i> Валюта:</label>
+                                <select id="currency" required>
+                                    <option value="RUB">Рубли (BYN)</option>
+                                    <option value="USD">Доллары (USD)</option>
+                                    <option value="EUR">Евро (EUR)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="initialBalance"><i class="fas fa-wallet"></i> Начальный баланс:</label>
+                                <input type="number" id="initialBalance" placeholder="1000" min="0" step="0.01" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="interestRate"><i class="fas fa-percentage"></i> Процентная ставка (%):</label>
+                            <input type="number" id="interestRate" placeholder="5.5" min="0" max="100" step="0.1">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="accountActive" checked>
+                                <span><i class="fas fa-check-circle"></i> Активный счет</span>
+                            </label>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn success">
+                                <i class="fas fa-check"></i> Открыть счет
+                            </button>
+                            <button type="button" class="btn danger" onclick="showSection('accounts')">
+                                <i class="fas fa-times"></i> Отмена
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <section id="account-operations" class="content-section">
+                
+                <div class="form-container">
+                    <h2><i class="fas fa-exchange-alt"></i> Операции по счету</h2>
+                    <div class="account-info" id="selected-account-info"></div>
+                    
+                    <div class="operation-buttons">
+                        <button class="btn primary" onclick="showDepositForm()">
+                            <i class="fas fa-plus"></i> Пополнить
+                        </button>
+                        <button class="btn secondary" onclick="showWithdrawForm()">
+                            <i class="fas fa-minus"></i> Снять
+                        </button>
+                    </div>
+
+                    <form id="operation-form" style="display: none;">
+                        <div class="form-group">
+                            <label for="operationAmount"><i class="fas fa-money-bill-wave"></i> Сумма:</label>
+                            <input type="number" id="operationAmount" placeholder="1000" min="0.01" step="0.01" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="operationDescription"><i class="fas fa-file-alt"></i> Описание:</label>
+                            <input type="text" id="operationDescription" placeholder="Назначение платежа">
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn success">
+                                <i class="fas fa-check"></i> Выполнить
+                            </button>
+                            <button type="button" class="btn danger" onclick="cancelOperation()">
+                                <i class="fas fa-times"></i> Отмена
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="transactions-section" id="transactions-list"></div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p class="api-info">API: /api/clients и /api/accounts</p>
+        </footer>
+    </div>
+
+    <script src="/public/js/app.js"></script>
+</body>
+</html>

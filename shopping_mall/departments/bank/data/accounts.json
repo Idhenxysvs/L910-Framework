@@ -1,0 +1,46 @@
+[
+  {
+    "id": "A3",
+    "accountNumber": "40702810345678901234",
+    "clientId": "C2",
+    "accountType": "checking",
+    "balance": 300000,
+    "currency": "BYN",
+    "openingDate": "2021-03-10T14:30:00.000Z",
+    "isActive": true,
+    "interestRate": 0,
+    "transactions": []
+  },
+  {
+    "id": "A4",
+    "accountNumber": "40702810456789012345",
+    "clientId": "C3",
+    "accountType": "checking",
+    "balance": 1000000,
+    "currency": "BYN",
+    "openingDate": "2018-06-20T09:15:00.000Z",
+    "isActive": true,
+    "interestRate": 0,
+    "transactions": []
+  },
+  {
+    "id": "Amjliceo6",
+    "accountNumber": "407029365698999",
+    "clientId": "Cmjliae95",
+    "accountType": "credit",
+    "balance": 1233889221,
+    "currency": "USD",
+    "openingDate": "2025-12-25T13:57:56.166Z",
+    "isActive": true,
+    "interestRate": 43,
+    "transactions": [
+      {
+        "date": "2025-12-25T13:58:08.482Z",
+        "type": "deposit",
+        "amount": 435678,
+        "description": "354678",
+        "balanceAfter": 1233889221
+      }
+    ]
+  }
+]

@@ -1,0 +1,15 @@
+{
+  "name": "l910-framework",
+  "version": "3.0.0",
+  "description": "Минималистичный веб-фреймворк для тренажерного зала с системой записей",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "keywords": ["framework", "nodejs", "gym", "appointments"],
+  "author": "Ваше Имя",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {}
+}

@@ -1,0 +1,54 @@
+[
+  {
+    "id": "T1",
+    "fullName": "Кузнецов Дмитрий Александрович",
+    "specialization": "Бодибилдинг",
+    "experienceYears": 8,
+    "certifications": [
+      "FPA",
+      "ACE",
+      "IFBB Pro"
+    ],
+    "workSchedule": {
+      "Понедельник": "10:00-18:00",
+      "Вторник": "10:00-18:00",
+      "Среда": "10:00-18:00",
+      "Четверг": "10:00-18:00",
+      "Пятница": "10:00-18:00",
+      "Суббота": "12:00-16:00"
+    },
+    "hourlyRate": 50,
+    "isAvailable": true,
+    "email": "kuznetsov@gym.com",
+    "phone": "+375 (29) 111-22-33",
+    "clientsCount": 15,
+    "rating": 4.8,
+    "bio": "Мастер спорта по бодибилдингу, подготовил 5 чемпионов региона.",
+    "photoUrl": ""
+  },
+  {
+    "id": "T2",
+    "fullName": "Смирнова Ольга Владимировна",
+    "specialization": "Йога",
+    "experienceYears": 6,
+    "certifications": [
+      "Yoga Alliance",
+      "Pilates Instructor"
+    ],
+    "workSchedule": {
+      "Понедельник": "08:00-14:00",
+      "Вторник": "08:00-14:00",
+      "Среда": "08:00-14:00",
+      "Четверг": "08:00-14:00",
+      "Пятница": "08:00-14:00"
+    },
+    "hourlyRate": 40,
+    "isAvailable": true,
+    "email": "smirnova@gym.com",
+    "phone": "+375 (33) 222-33-44",
+    "clientsCount": 12,
+    "rating": 4.9,
+    "bio": "Сертифицированный инструктор по йоге и пилатесу с медицинским образованием.",
+    "photoUrl": ""
+  }
+]

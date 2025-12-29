@@ -1,0 +1,81 @@
+[
+  {
+    "id": "M1",
+    "fullName": "Иванов Иван Иванович",
+    "age": 28,
+    "email": "ivanov@example.com",
+    "phone": "+375 (29) 123-45-67",
+    "membershipType": "Premium",
+    "startDate": "2025-11-21T10:00:00.000Z",
+    "endDate": "2025-12-21T10:00:00.000Z",
+    "isActive": true,
+    "trainerId": "T1",
+    "workoutSchedule": [
+      "Понедельник",
+      "Среда",
+      "Пятница"
+    ],
+    "payments": [
+      {
+        "date": "2025-11-21T10:00:00.000Z",
+        "amount": 200,
+        "method": "card"
+      }
+    ],
+    "height": 180,
+    "weight": 75,
+    "goals": [
+      "Набрать мышечную массу",
+      "Улучшить силовые показатели"
+    ]
+  },
+  {
+    "id": "M2",
+    "fullName": "Петрова Анна Сергеевна",
+    "age": 32,
+    "email": "petrova@example.com",
+    "phone": "+375 (44) 987-65-43",
+    "membershipType": "Standard",
+    "startDate": "2025-12-01T14:30:00.000Z",
+    "endDate": "2026-01-01T14:30:00.000Z",
+    "isActive": true,
+    "trainerId": null,
+    "workoutSchedule": [
+      "Вторник",
+      "Четверг"
+    ],
+    "payments": [
+      {
+        "date": "2025-12-01T14:30:00.000Z",
+        "amount": 120,
+        "method": "cash"
+      }
+    ],
+    "height": 165,
+    "weight": 60,
+    "goals": [
+      "Похудеть",
+      "Укрепить мышцы кора"
+    ]
+  },
+  {
+    "id": "Mmjfwdw9su4oja",
+    "fullName": "Долбик Олексий Викторович",
+    "age": 21,
+    "email": "dovbik@mail.ua",
+    "phone": "+375 25 6614880",
+    "membershipType": "Premium",
+    "startDate": "2025-12-21T15:44:23.200Z",
+    "endDate": "2026-01-21T15:44:23.200Z",
+    "isActive": true,
+    "trainerId": null,
+    "workoutSchedule": [],
+    "payments": [],
+    "height": 184,
+    "weight": 83,
+    "goals": [
+      "Набрать мышечную массу",
+      "Улучшить силовые показатели"
+    ]
+  }
+]

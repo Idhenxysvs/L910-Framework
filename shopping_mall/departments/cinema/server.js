@@ -454,8 +454,7 @@ app.delete('/api/sessions/:id', async (req, res) => {
     res.json({ message: 'Session deleted successfully' });
 });
 
-// Запуск сервера
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
     console.log(`Cinema API server is running on http://localhost:${PORT}`);
     console.log(`Frontend available at http://localhost:${PORT}`);

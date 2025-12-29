@@ -1,4 +1,3 @@
-// Основной класс API для взаимодействия с сервером
 class CinemaAPI {
     constructor(baseUrl = '') {
         this.baseUrl = baseUrl;
@@ -40,7 +39,6 @@ class CinemaAPI {
         }
     }
 
-    // Методы для работы с фильмами
     async getFilms() {
         return this.request('/api/films');
     }
@@ -65,7 +63,6 @@ class CinemaAPI {
         return this.request(`/api/films/${id}`, 'DELETE');
     }
 
-    // Методы для работы с сеансами
     async getSessions() {
         return this.request('/api/sessions');
     }
@@ -90,7 +87,6 @@ class CinemaAPI {
         return this.request(`/api/sessions/${id}`, 'DELETE');
     }
 
-    // Проверка доступности сервера
     async checkHealth() {
         try {
             const response = await fetch('/api/films');
@@ -101,16 +97,13 @@ class CinemaAPI {
     }
 }
 
-// Глобальные переменные
 let currentFilmId = null;
 let currentSessionId = null;
 let filmsData = [];
 let sessionsData = [];
 
-// Создаем экземпляр API
 const api = new CinemaAPI();
 
-// Вспомогательные функции
 function showNotification(message, type = 'info') {
     const notifications = document.getElementById('notifications');
     if (!notifications) return;
@@ -136,12 +129,10 @@ function showNotification(message, type = 'info') {
     
     notifications.appendChild(notification);
     
-    // Добавляем обработчик для кнопки закрытия
     notification.querySelector('.notification-close').addEventListener('click', () => {
         notification.remove();
     });
     
-    // Автоудаление через 5 секунд
     setTimeout(() => {
         if (notification.parentElement) {
             notification.remove();
@@ -167,13 +158,11 @@ function showSection(sectionId) {
         section.classList.remove('active');
     });
     
-    // Показать выбранную секцию
     const section = document.getElementById(`${sectionId}-section`);
     if (section) {
         section.classList.add('active');
     }
     
-    // Обновить активные ссылки в навигации
     document.querySelectorAll('.nav-link').forEach(link => {
         link.classList.remove('active');
     });
@@ -191,25 +180,10 @@ function toggleMobileMenu() {
     }
 }
 
-// Функция для кнопки "Назад"
 function goBack() {
-    // Можно настроить URL для перехода на другую страницу
-    // Например, если у вас есть страница index.html (главная) и другие страницы:
-    
-    // Вариант 1: Переход на конкретную страницу
-    window.location.href = 'https://example.com'; // Замените на нужный URL
-    
-    // Вариант 2: Возврат в истории браузера
-    // window.history.back();
-    
-    // Вариант 3: Переход на другую страницу в вашем проекте
-    // window.location.href = '/other-page.html';
-    
-    // Вариант 4: Переход на главную страницу
-    // window.location.href = '/';
+    window.location.href = 'http://localhost:3000';
 }
 
-// Функции для работы с фильмами
 async function getFilms() {
     const loading = document.getElementById('films-loading');
     const empty = document.getElementById('films-empty');
@@ -230,7 +204,6 @@ async function getFilms() {
         
         if (empty) empty.style.display = 'none';
         
-        // Отображаем фильмы
         if (list) {
             list.innerHTML = filmsData.map(film => `
                 <div class="film-card">
@@ -426,7 +399,6 @@ async function generateRandomFilm() {
     }
 }
 
-// Функции для работы с сеансами
 async function getSessions() {
     const loading = document.getElementById('sessions-loading');
     const empty = document.getElementById('sessions-empty');
@@ -447,13 +419,11 @@ async function getSessions() {
         
         if (empty) empty.style.display = 'none';
         
-        // Получаем названия фильмов для отображения
         const filmMap = {};
         filmsData.forEach(film => {
             filmMap[film.id] = film.title;
         });
         
-        // Отображаем сеансы в таблице
         if (tbody) {
             tbody.innerHTML = sessionsData.map(session => `
                 <tr>
@@ -637,7 +607,6 @@ async function generateRandomSession() {
     }
 }
 
-// Вспомогательные функции
 function updateCounters() {
     const filmsCount = document.getElementById('films-count');
     const sessionsCount = document.getElementById('sessions-count');
@@ -646,7 +615,6 @@ function updateCounters() {
     if (sessionsCount) sessionsCount.textContent = sessionsData.length;
 }
 
-// Мониторинг сервера
 async function monitorServer() {
     try {
         const isAlive = await api.checkHealth();
@@ -676,19 +644,14 @@ async function monitorServer() {
     }
 }
 
-// Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', async () => {
-    // Проверяем сервер
     await monitorServer();
     
-    // Загружаем данные
     await getFilms();
     await getSessions();
     
-    // Устанавливаем интервалы для обновления
     setInterval(monitorServer, 30000);
     
-    // Назначаем обработчики форм
     const filmForm = document.getElementById('filmForm');
     if (filmForm) {
         filmForm.addEventListener('submit', submitFilmForm);
@@ -699,7 +662,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         sessionForm.addEventListener('submit', submitSessionForm);
     }
     
-    // Закрытие модальных окон
     const closeButtons = document.querySelectorAll('.close-btn');
     closeButtons.forEach(btn => {
         btn.addEventListener('click', function() {
@@ -710,7 +672,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
     
-    // Закрытие модальных окон при клике вне
     window.addEventListener('click', (event) => {
         const filmModal = document.getElementById('film-modal');
         const sessionModal = document.getElementById('session-modal');
@@ -724,7 +685,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
     
-    // Закрытие по Escape
     document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape') {
             hideFilmForm();
@@ -733,7 +693,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 });
 
-// Сделаем функции глобальными для доступа из HTML
 window.showSection = showSection;
 window.toggleMobileMenu = toggleMobileMenu;
 window.goBack = goBack;

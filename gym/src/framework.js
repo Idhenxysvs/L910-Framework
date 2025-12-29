@@ -77,7 +77,6 @@ class GymFramework {
         return null;
     }
 
-    // Конвертация пути в regex
     convertToRegex(path) {
         return new RegExp('^' + path.replace(/:\w+/g, '([^/]+)') + '$');
     }

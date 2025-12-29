@@ -93,12 +93,14 @@ app.use(async (req, res, next) => {
     }
 });
 app.useErrorHandler(errorHandler);
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3002;
 app.listen(PORT, () => {
+    console.log('='.repeat(50));
     console.log(`✅ Сервер запущен: http://localhost:${PORT}`);
     console.log(`👤 Клиенты API: http://localhost:${PORT}/api/members`);
     console.log(`🏋️ Тренеры API: http://localhost:${PORT}/api/trainers`);
     console.log(`📅 Записи API: http://localhost:${PORT}/api/appointments`);
     console.log(`⭐ Отзывы API: http://localhost:${PORT}/api/reviews`);
     console.log(`🌐 Фронтенд: http://localhost:${PORT}`);
+    console.log('='.repeat(50));
 });

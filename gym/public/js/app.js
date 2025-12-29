@@ -839,7 +839,7 @@ async function editMember(id) {
         document.getElementById('height').value = member.height || '';
         document.getElementById('weight').value = member.weight || '';
         document.getElementById('goals').value = member.goals?.join(', ') || '';
-        document.getElementById('isActive').checked = member.isActive !== false;в
+        document.getElementById('isActive').checked = member.isActive !== false;
         await loadTrainersForSelect();
         if (member.trainerId) {
             document.getElementById('trainerId').value = member.trainerId;

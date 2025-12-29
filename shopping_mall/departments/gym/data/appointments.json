@@ -1,0 +1,35 @@
+[
+  {
+    "id": "A1",
+    "memberId": "M1",
+    "trainerId": "T1",
+    "date": "2025-12-21",
+    "time": "10:00",
+    "duration": 60,
+    "status": "completed",
+    "notes": "Первая тренировка, фокус на базовые упражнения",
+    "createdAt": "2025-12-20T08:00:00.000Z"
+  },
+  {
+    "id": "A2",
+    "memberId": "M2",
+    "trainerId": "T2",
+    "date": "2025-12-22",
+    "time": "14:00",
+    "duration": 90,
+    "status": "completed",
+    "notes": "Йога для начинающих",
+    "createdAt": "2025-12-20T09:30:00.000Z"
+  },
+  {
+    "id": "Amjfwfxp1q7a02",
+    "memberId": "M2",
+    "trainerId": "T1",
+    "date": "2025-12-22",
+    "time": "14:30",
+    "duration": 60,
+    "status": "completed",
+    "notes": "",
+    "createdAt": "2025-12-21T15:45:58.357Z"
+  }
+]

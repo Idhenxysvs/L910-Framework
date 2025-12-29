@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "name": "Антон Чигур",
+    "country": "США",
+    "active": true,
+    "albumCount": 2,
+    "popularity": 6.7,
+    "upcomingConcerts": [
+      0,
+      4
+    ],
+    "debutDate": "2026-01-09",
+    "createdAt": "2025-12-22T12:00:00.100Z",
+    "updatedAt": "2025-12-26T10:22:26.223Z"
+  },
+  {
+    "id": 2,
+    "name": "Виктор ЖелудОк",
+    "country": "РФ",
+    "active": true,
+    "albumCount": 5,
+    "popularity": 7.7,
+    "upcomingConcerts": [
+      2,
+      3,
+      1
+    ],
+    "debutDate": "2026-01-06",
+    "createdAt": "2025-12-25T18:31:51.240Z",
+    "updatedAt": "2025-12-26T10:24:19.401Z"
+  },
+  {
+    "id": 3,
+    "name": "Михаил Круг",
+    "country": "Россия",
+    "active": false,
+    "albumCount": 10,
+    "popularity": 8.9,
+    "upcomingConcerts": [],
+    "debutDate": "2025-12-31",
+    "createdAt": "2025-12-26T09:44:59.081Z"
+  }
+]

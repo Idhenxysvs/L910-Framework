@@ -1,0 +1,13 @@
+{
+  "name": "concert-manager",
+  "version": "2.2.1",
+  "description": "Панель управления концертов и артистов",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js"
+  },
+  "keywords": ["concerts", "schedule", "music", "events"],
+  "author": "realtapok",
+  "license": "MIT"
+}

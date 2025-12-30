@@ -260,21 +260,19 @@ class App extends EventEmitter {
         });
         
         this.server.listen(port, () => {
-            console.log(`Server running on port ${port}`);
+            console.log('|=================================================================|');
+            console.log(`|Сервер запущен на порту: ${port}                                    |`);
             if (callback) callback();
         });
     }
 }
 
-// Создаем экземпляр приложения
 const app = new App();
 
-// Middleware для логирования
 app.use(async (req, res) => {
     console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
 });
 
-// Функции для работы с данными
 const readJSON = async (filename) => {
     try {
         const data = await fs.readFile(`./data/${filename}`, 'utf8');
@@ -288,7 +286,6 @@ const writeJSON = async (filename, data) => {
     await fs.writeFile(`./data/${filename}`, JSON.stringify(data, null, 2));
 };
 
-// Маршруты для фильмов
 app.get('/api/films', async (req, res) => {
     const films = await readJSON('films.json');
     res.json(films);
@@ -371,7 +368,6 @@ app.delete('/api/films/:id', async (req, res) => {
     res.json({ message: 'Film deleted successfully' });
 });
 
-// Маршруты для сеансов
 app.get('/api/sessions', async (req, res) => {
     const sessions = await readJSON('sessions.json');
     res.json(sessions);
@@ -456,6 +452,7 @@ app.delete('/api/sessions/:id', async (req, res) => {
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
-    console.log(`Cinema API server is running on http://localhost:${PORT}`);
-    console.log(`Frontend available at http://localhost:${PORT}`);
+    console.log(`|API сервера: http://localhost:${PORT}                               |`);
+    console.log(`|Фронтенд сервера: http://localhost:${PORT}                          |`);
+    console.log('|=================================================================|');
 });

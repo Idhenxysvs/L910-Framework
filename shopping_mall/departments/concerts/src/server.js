@@ -138,10 +138,10 @@ app.get('/', (req, res) => {
 const PORT = process.env.PORT || 3003;
 const packageJson = require('../package.json');
 app.listen(PORT, () => {
-  console.log(`============================================`);
-  console.log(`💼 Менеджер концертов — ${packageJson.version}:`);
-  console.log(`📶 Адрес сайта – http://localhost:${PORT}`);
-  console.log('📦 API: документация в README проекта');
-  console.log(`============================================`);
+  console.log('|=================================================================|');
+  console.log(`|💼 Менеджер концертов — ${packageJson.version}:                                   |`);
+  console.log(`|📶 Адрес сайта – http://localhost:${PORT}                           |`);
+  console.log('|📦 API: документация в README проекта                            |');
+  console.log('|=================================================================|');
 });
 module.exports = App;

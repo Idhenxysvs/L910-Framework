@@ -25,7 +25,8 @@ class GymFramework {
         });
 
         server.listen(port, callback);
-        console.log(`🏋️ Сервер тренажерного зала запущен на порту ${port}`);
+        console.log(`|${'='.repeat(65)}|`);
+        console.log(`|🏋️ Сервер тренажерного зала запущен на порту ${port}                 |`);
         return server;
     }
 

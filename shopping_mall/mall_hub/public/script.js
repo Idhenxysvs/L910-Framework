@@ -31,7 +31,7 @@ document.querySelectorAll('.service-card, .service-btn').forEach(element => {
         const service = servicesData[serviceType];
         
         if (service && service.url) {
-            window.open(service.url, '_blank');
+            window.location.href = service.url;
         }
     });
 });
@@ -43,7 +43,7 @@ document.querySelectorAll('.info-card').forEach(element => {
         const service = servicesData[randomService];
         
         if (service && service.url) {
-            window.open(service.url, '_blank');
+            window.location.href = service.url;
         }
     });
 });

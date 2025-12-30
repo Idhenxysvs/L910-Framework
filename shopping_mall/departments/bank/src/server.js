@@ -80,9 +80,9 @@ app.useErrorHandler(errorHandler);
 
 const PORT = process.env.PORT || 3004;
 app.listen(PORT, () => {
-    console.log('='.repeat(50));
-    console.log(`Сервер запущен: http://localhost:${PORT}`);
-    console.log(`Клиенты API: http://localhost:${PORT}/api/clients`);
-    console.log(`Счета API: http://localhost:${PORT}/api/accounts`);
-    console.log('='.repeat(50));
+    console.log(`|${'='.repeat(65)}|`);
+    console.log(`|Сервер запущен: http://localhost:${PORT}                            |`);
+    console.log(`|Клиенты API: http://localhost:${PORT}/api/clients                   |`);
+    console.log(`|Счета API: http://localhost:${PORT}/api/accounts                    |`);
+    console.log(`|${'='.repeat(65)}|`);
 });
